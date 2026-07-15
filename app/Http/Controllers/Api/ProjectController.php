@@ -78,6 +78,7 @@ class ProjectController extends Controller
             $score = $scores->get($student->id);
 
             return array_merge($student->toArray(), [
+                'score_recorded' => $score !== null,
                 'scores' => [
                     'knowledge' => (float) ($score->knowledge_score ?? 0),
                     'skill' => (float) ($score->skill_score ?? 0),

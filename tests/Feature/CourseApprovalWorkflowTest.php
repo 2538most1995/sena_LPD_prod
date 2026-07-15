@@ -63,6 +63,42 @@ class CourseApprovalWorkflowTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_course_can_be_updated_with_multipart_method_spoofing(): void
+    {
+        $district = $this->user('DISTRICT01', 'district_admin');
+        $subdistrict = $this->user('SUBDISTRICT01', 'subdistrict_admin', $district->id);
+        $course = Course::query()->create([
+            'created_by' => $subdistrict->id,
+            'name' => 'หลักสูตรก่อนแก้ไข',
+            'category' => 'การเรียนการสอน',
+            'hours' => 5,
+            'owner' => $subdistrict->school_name,
+            'description' => 'รายละเอียดเดิม',
+            'approval_status' => 'approved',
+        ]);
+
+        $this->actingAs($subdistrict)->post("/api/v1/courses/{$course->id}", [
+            '_method' => 'PUT',
+            'name' => 'หลักสูตรหลังแก้ไข',
+            'category' => 'ทักษะอาชีพ',
+            'hours' => 9,
+            'owner' => 'ค่าจากหน้าจอที่ระบบจะไม่ใช้',
+            'description' => 'รายละเอียดหลักสูตรฉบับแก้ไข',
+        ], ['Accept' => 'application/json'])
+            ->assertOk()
+            ->assertJsonPath('data.name', 'หลักสูตรหลังแก้ไข')
+            ->assertJsonPath('data.approval_status', 'pending');
+
+        $this->assertDatabaseHas('courses', [
+            'id' => $course->id,
+            'name' => 'หลักสูตรหลังแก้ไข',
+            'hours' => 9,
+            'owner' => $subdistrict->school_name,
+            'approval_status' => 'pending',
+        ]);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'course.updated', 'subject_id' => $course->id]);
+    }
+
     private function user(string $schoolId, string $role, ?int $parentId = null): User
     {
         return User::query()->create([

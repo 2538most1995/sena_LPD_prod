@@ -40,7 +40,7 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('/courses', [CourseController::class, 'index']);
         Route::post('/courses', [CourseController::class, 'store']);
-        Route::post('/courses/{course}', [CourseController::class, 'update']);
+        Route::match(['post', 'put'], '/courses/{course}', [CourseController::class, 'update']);
         Route::delete('/courses/{course}', [CourseController::class, 'destroy']);
         Route::post('/courses/{course}/review', [CourseController::class, 'review']);
         Route::get('/courses/{course}/files/{type}', [CourseController::class, 'file'])->name('api.courses.file');

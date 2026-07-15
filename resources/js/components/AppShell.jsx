@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { motion, useReducedMotion } from 'motion/react';
 import { Avatar, Badge, Button } from '../ui';
 import {
     AlertRegular,
@@ -60,7 +60,6 @@ function linksFor(user) {
 export default function AppShell({ user, apiBase, logoutUrl, dark, onToggleDark, unread = 0, onLogout }) {
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
-    const location = useLocation();
     const reduceMotion = useReducedMotion();
 
     const logout = async () => {
@@ -154,18 +153,14 @@ export default function AppShell({ user, apiBase, logoutUrl, dark, onToggleDark,
                         />
                     </div>
                 </header>
-                <AnimatePresence initial={false} mode="sync">
-                    <motion.main
-                        key={location.pathname}
-                        className="page-content"
-                        initial={reduceMotion ? false : { opacity: 0, transform: 'translateY(8px)' }}
-                        animate={{ opacity: 1, transform: 'translateY(0)' }}
-                        exit={reduceMotion ? { opacity: 1 } : { opacity: 0, transform: 'translateY(-4px)' }}
-                        transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.23, 1, 0.32, 1] }}
-                    >
-                        <Outlet context={{ user, apiBase }} />
-                    </motion.main>
-                </AnimatePresence>
+                <motion.main
+                    className="page-content"
+                    initial={reduceMotion ? false : { opacity: 0, transform: 'translateY(8px)' }}
+                    animate={{ opacity: 1, transform: 'translateY(0)' }}
+                    transition={{ duration: reduceMotion ? 0 : 0.22, ease: [0.23, 1, 0.32, 1] }}
+                >
+                    <Outlet context={{ user, apiBase }} />
+                </motion.main>
             </div>
         </div>
     );

@@ -121,16 +121,16 @@ export function DialogBody({ children }) {
     return <>{children}</>;
 }
 
-export function DialogTitle({ children }) {
-    return <MuiDialogTitle>{children}</MuiDialogTitle>;
+export function DialogTitle({ children, ...props }) {
+    return <MuiDialogTitle {...props}>{children}</MuiDialogTitle>;
 }
 
-export function DialogContent({ className, children }) {
-    return <MuiDialogContent className={className}>{children}</MuiDialogContent>;
+export function DialogContent({ className, children, ...props }) {
+    return <MuiDialogContent className={className} {...props}>{children}</MuiDialogContent>;
 }
 
-export function DialogActions({ children }) {
-    return <MuiDialogActions>{children}</MuiDialogActions>;
+export function DialogActions({ children, ...props }) {
+    return <MuiDialogActions {...props}>{children}</MuiDialogActions>;
 }
 
 export function Avatar({ name, image, size = 40, color: _color, ...props }) {
@@ -170,12 +170,12 @@ export function MessageBarBody({ children }) {
     return <>{children}</>;
 }
 
-export function TabList({ selectedValue, onTabSelect, children }) {
-    return <MuiTabs value={selectedValue} onChange={(event, value) => onTabSelect?.(event, { value })} variant="scrollable" scrollButtons="auto">{children}</MuiTabs>;
+export function TabList({ selectedValue, onTabSelect, children, ...props }) {
+    return <MuiTabs value={selectedValue} onChange={(event, value) => onTabSelect?.(event, { value })} variant="scrollable" scrollButtons="auto" {...props}>{children}</MuiTabs>;
 }
 
-export function Tab({ value, children }) {
-    return <MuiTab value={value} label={children} disableRipple />;
+export function Tab({ value, children, ...props }) {
+    return <MuiTab value={value} label={children} disableRipple {...props} />;
 }
 
 export function Skeleton({ className, children }) {

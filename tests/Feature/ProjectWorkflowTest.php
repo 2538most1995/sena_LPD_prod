@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Models\ActivityPhoto;
 use App\Models\Course;
 use App\Models\LearningProject;
 use App\Models\Lecturer;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
@@ -63,7 +65,28 @@ class ProjectWorkflowTest extends TestCase
         $this->assertDatabaseHas('scores', ['project_id' => $project->id, 'student_id' => $student->id, 'knowledge_score' => 18]);
         $this->actingAs($subdistrict)->getJson("/api/v1/projects/{$project->id}")
             ->assertOk()
-            ->assertJsonPath('data.students.0.scores.attribute', 38);
+            ->assertJsonPath('data.students.0.scores.attribute', 38)
+            ->assertJsonPath('data.students.0.score_recorded', true);
+
+        $this->actingAs($subdistrict)->post("/api/v1/projects/{$project->id}/photos", [
+            'photo_type' => 'activity',
+            'photos' => [UploadedFile::fake()->image('activity.jpg', 1200, 900)],
+            'captions' => ['ภาพทดสอบการจัดกิจกรรม'],
+        ], ['Accept' => 'application/json'])
+            ->assertCreated()
+            ->assertJsonPath('data.0.caption', 'ภาพทดสอบการจัดกิจกรรม');
+
+        $photo = ActivityPhoto::query()->firstOrFail();
+        $this->actingAs($subdistrict)->getJson("/api/v1/projects/{$project->id}")
+            ->assertOk()
+            ->assertJsonPath('data.photos.0.id', $photo->id)
+            ->assertJsonPath('data.photos.0.caption', 'ภาพทดสอบการจัดกิจกรรม');
+        $this->actingAs($subdistrict)->get("/api/v1/projects/{$project->id}/photos/{$photo->id}/file")
+            ->assertOk()
+            ->assertHeader('X-Content-Type-Options', 'nosniff');
+        $this->actingAs($subdistrict)->deleteJson("/api/v1/projects/{$project->id}/photos/{$photo->id}")
+            ->assertOk();
+        $this->assertDatabaseMissing('activity_photos', ['id' => $photo->id]);
     }
 
     private function projectPayload(int $courseId, int $lecturerId): array
