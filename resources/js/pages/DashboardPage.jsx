@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button, Card, Spinner } from '@fluentui/react-components';
-import { ArrowSyncRegular, BookRegular, CheckmarkCircleRegular, ClipboardTaskListLtrRegular, PeopleRegular } from '@fluentui/react-icons';
+import { ArrowRightRegular, ArrowSyncRegular, BookRegular, CheckmarkCircleRegular, ClipboardTaskListLtrRegular, PeopleRegular } from '@fluentui/react-icons';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { apiRequest } from '../api';
 import PageHeader from '../components/PageHeader';
@@ -35,10 +35,24 @@ export default function DashboardPage() {
             />
             <ErrorMessage message={query.error?.message} />
             <section className="stat-grid">
-                {stats.map(([label, value, Icon, to]) => (
-                    <Card key={label} className="stat-card" onClick={() => navigate(to)} tabIndex={0}>
+                {stats.map(([label, value, Icon, to], index) => (
+                    <Card
+                        key={label}
+                        className="stat-card"
+                        data-tone={index + 1}
+                        role="link"
+                        tabIndex={0}
+                        onClick={() => navigate(to)}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                navigate(to);
+                            }
+                        }}
+                    >
                         <span className="stat-icon"><Icon /></span>
-                        <div><span>{label}</span><strong>{value.toLocaleString('th-TH')}</strong></div>
+                        <div className="stat-copy"><span>{label}</span><strong>{value.toLocaleString('th-TH')}</strong></div>
+                        <ArrowRightRegular className="stat-arrow" />
                     </Card>
                 ))}
             </section>

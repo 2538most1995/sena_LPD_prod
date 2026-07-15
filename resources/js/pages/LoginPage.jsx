@@ -45,7 +45,7 @@ export default function LoginPage({ loginUrl, assetsUrl, onLogin }) {
             <section className="login-panel">
                 <form className="login-form" onSubmit={submit}>
                     <div>
-                        <p className="page-eyebrow">Sena LPD</p>
+                        <p className="page-kicker">Sena LPD</p>
                         <h2>ยินดีต้อนรับ</h2>
                         <p>เข้าสู่ระบบการเรียนรู้เพื่อการพัฒนาตนเอง</p>
                     </div>
