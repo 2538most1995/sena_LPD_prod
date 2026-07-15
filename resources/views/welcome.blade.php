@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+        <meta name="theme-color" content="#5c2789">
+        <title>{{ config('app.name') }}</title>
+
+        @viteReactRefresh
+        @vite(['resources/css/app.css', 'resources/js/app.jsx'])
+    </head>
+    <body>
+        <div
+            id="sena-next-root"
+            data-api-base="{{ url('/api/v1') }}"
+            data-assets-url="{{ asset('assets') }}"
+            data-login-url="{{ route('next.login') }}"
+            data-logout-url="{{ route('next.logout') }}"
+        ></div>
+    </body>
+</html>

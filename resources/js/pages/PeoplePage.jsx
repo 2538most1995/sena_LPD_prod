@@ -1,0 +1,65 @@
+import React, { useMemo, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, Field, Input, Textarea } from '@fluentui/react-components';
+import { AddRegular, DeleteRegular, EditRegular, SearchRegular } from '@fluentui/react-icons';
+import { useOutletContext } from 'react-router-dom';
+import { apiRequest, firstError, queryString } from '../api';
+import DataTable from '../components/DataTable';
+import PageHeader from '../components/PageHeader';
+import { ErrorMessage, SuccessMessage } from '../components/Feedback';
+
+const studentEmpty = { prefix: 'นาย', first_name: '', last_name: '', gender: 'ชาย', id_card: '', birthday: '', education: '', career: '', target_group: '', annual_income: '', address: '', phone: '', registered_at: '' };
+const lecturerEmpty = { prefix: 'นาย', first_name: '', last_name: '', id_card: '', birthday: '', education: '', career: '', address: '', phone: '', registered_at: '', expertise: '' };
+
+export default function PeoplePage({ type }) {
+    const isStudent = type === 'students';
+    const { apiBase } = useOutletContext();
+    const queryClient = useQueryClient();
+    const [search, setSearch] = useState('');
+    const [dialog, setDialog] = useState(null);
+    const [form, setForm] = useState(isStudent ? studentEmpty : lecturerEmpty);
+    const [feedback, setFeedback] = useState('');
+    const [error, setError] = useState('');
+    const query = useQuery({ queryKey: [type, search], queryFn: () => apiRequest(`${apiBase}/${type}${queryString({ search, per_page: 100 })}`) });
+    const save = useMutation({
+        mutationFn: () => apiRequest(dialog?.id ? `${apiBase}/${type}/${dialog.id}` : `${apiBase}/${type}`, { method: dialog?.id ? 'PUT' : 'POST', body: form }),
+        onSuccess: (result) => { queryClient.invalidateQueries({ queryKey: [type] }); queryClient.invalidateQueries({ queryKey: ['references'] }); setDialog(null); setFeedback(result.message); setError(''); },
+        onError: (requestError) => setError(firstError(requestError)),
+    });
+    const remove = useMutation({
+        mutationFn: (id) => apiRequest(`${apiBase}/${type}/${id}`, { method: 'DELETE' }),
+        onSuccess: (result) => { queryClient.invalidateQueries({ queryKey: [type] }); setFeedback(result.message); },
+        onError: (requestError) => setError(firstError(requestError)),
+    });
+    const openCreate = () => { setForm({ ...(isStudent ? studentEmpty : lecturerEmpty) }); setDialog({}); setError(''); };
+    const openEdit = (person) => {
+        const next = { ...(isStudent ? studentEmpty : lecturerEmpty) };
+        Object.keys(next).forEach((key) => { next[key] = person[key] ?? ''; });
+        next.birthday = person.birthday?.slice(0, 10) ?? '';
+        next.registered_at = person.registered_at?.slice(0, 10) ?? '';
+        setForm(next); setDialog(person); setError('');
+    };
+    const update = (name, value) => setForm((current) => ({ ...current, [name]: value }));
+    const columns = useMemo(() => [
+        { header: 'ชื่อและนามสกุล', cell: ({ row }) => <div className="primary-cell"><strong>{row.original.prefix}{row.original.first_name} {row.original.last_name}</strong><span>เลขบัตร {row.original.id_card}</span></div> },
+        { header: isStudent ? 'กลุ่มเป้าหมาย' : 'ความเชี่ยวชาญ', accessorKey: isStudent ? 'target_group' : 'expertise' },
+        { header: 'อาชีพ', accessorKey: 'career' },
+        { header: 'โทรศัพท์', accessorKey: 'phone' },
+        { header: '', id: 'actions', cell: ({ row }) => <div className="row-actions"><Button appearance="subtle" icon={<EditRegular />} aria-label="แก้ไข" onClick={() => openEdit(row.original)} /><Button appearance="subtle" icon={<DeleteRegular />} aria-label="ลบ" onClick={() => window.confirm(`ยืนยันลบ ${row.original.first_name} ${row.original.last_name}`) && remove.mutate(row.original.id)} /></div> },
+    ], [isStudent]);
+
+    return <>
+        <PageHeader eyebrow={isStudent ? 'ฐานข้อมูลผู้รับบริการ' : 'ทะเบียนบุคลากร'} title={isStudent ? 'ผู้เรียน' : 'วิทยากร'} description={isStudent ? 'จัดเก็บข้อมูลผู้เรียนและนำไปลงทะเบียนเข้ากลุ่มกิจกรรม' : 'จัดเก็บข้อมูลวิทยากร ความเชี่ยวชาญ และประวัติการสอน'} actions={<Button appearance="primary" icon={<AddRegular />} onClick={openCreate}>เพิ่ม{isStudent ? 'ผู้เรียน' : 'วิทยากร'}</Button>} />
+        <SuccessMessage message={feedback} /><ErrorMessage message={error || query.error?.message} />
+        <section className="content-card"><div className="filter-row"><Input contentBefore={<SearchRegular />} placeholder={`ค้นหา${isStudent ? 'ผู้เรียน' : 'วิทยากร'} ชื่อ เลขบัตร หรือโทรศัพท์`} value={search} onChange={(_, data) => setSearch(data.value)} /><span>{query.data?.total ?? 0} รายการ</span></div><DataTable columns={columns} data={query.data?.data ?? []} loading={query.isLoading} emptyTitle={`ยังไม่มี${isStudent ? 'ผู้เรียน' : 'วิทยากร'}`} /></section>
+        <Dialog open={dialog !== null} onOpenChange={(_, data) => !data.open && setDialog(null)}><DialogSurface className="wide-dialog"><form onSubmit={(event) => { event.preventDefault(); save.mutate(); }}><DialogBody><DialogTitle>{dialog?.id ? 'แก้ไข' : 'เพิ่ม'}{isStudent ? 'ผู้เรียน' : 'วิทยากร'}</DialogTitle><DialogContent className="form-stack scroll-form"><ErrorMessage message={error} />
+            <div className="form-grid three"><Field label="คำนำหน้า" required><select className="native-select" value={form.prefix} onChange={(event) => update('prefix', event.target.value)}>{['นาย', 'นาง', 'นางสาว'].map((value) => <option key={value}>{value}</option>)}</select></Field><Field label="ชื่อ" required><Input value={form.first_name} onChange={(_, data) => update('first_name', data.value)} /></Field><Field label="นามสกุล" required><Input value={form.last_name} onChange={(_, data) => update('last_name', data.value)} /></Field></div>
+            <div className="form-grid two"><Field label="เลขประจำตัวประชาชน" required><Input value={form.id_card} onChange={(_, data) => update('id_card', data.value)} maxLength={20} /></Field><Field label="วันเกิด"><Input type="date" value={form.birthday} onChange={(_, data) => update('birthday', data.value)} /></Field></div>
+            {isStudent ? <div className="form-grid two"><Field label="เพศ" required><select className="native-select" value={form.gender} onChange={(event) => update('gender', event.target.value)}>{['ชาย', 'หญิง', 'ไม่ระบุ'].map((value) => <option key={value}>{value}</option>)}</select></Field><Field label="กลุ่มเป้าหมาย"><Input value={form.target_group} onChange={(_, data) => update('target_group', data.value)} /></Field></div> : <Field label="ความเชี่ยวชาญ" required><Input value={form.expertise} onChange={(_, data) => update('expertise', data.value)} /></Field>}
+            <div className="form-grid two"><Field label="การศึกษา"><Input value={form.education} onChange={(_, data) => update('education', data.value)} /></Field><Field label="อาชีพ"><Input value={form.career} onChange={(_, data) => update('career', data.value)} /></Field></div>
+            <div className="form-grid two"><Field label="โทรศัพท์"><Input value={form.phone} onChange={(_, data) => update('phone', data.value)} /></Field><Field label="วันที่ขึ้นทะเบียน"><Input type="date" value={form.registered_at} onChange={(_, data) => update('registered_at', data.value)} /></Field></div>
+            {isStudent ? <Field label="รายได้ต่อปี"><Input type="number" min="0" value={String(form.annual_income)} onChange={(_, data) => update('annual_income', data.value)} /></Field> : null}
+            <Field label="ที่อยู่"><Textarea rows={3} value={form.address} onChange={(_, data) => update('address', data.value)} /></Field>
+        </DialogContent><DialogActions><Button type="button" onClick={() => setDialog(null)}>ยกเลิก</Button><Button type="submit" appearance="primary" disabled={save.isPending}>{save.isPending ? 'กำลังบันทึก' : 'บันทึกข้อมูล'}</Button></DialogActions></DialogBody></form></DialogSurface></Dialog>
+    </>;
+}
