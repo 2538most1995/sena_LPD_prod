@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageBar, MessageBarBody } from '@fluentui/react-components';
+import { MessageBar, MessageBarBody } from '../ui';
 
 export function ErrorMessage({ message }) {
     if (!message) return null;

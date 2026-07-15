@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, Field, Input, Textarea } from '@fluentui/react-components';
-import { AddRegular, DeleteRegular, EditRegular, SearchRegular } from '@fluentui/react-icons';
+import { Button, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, Field, Input, Textarea } from '../ui';
+import { AddRegular, DeleteRegular, EditRegular, SearchRegular } from '../ui/icons';
 import { useOutletContext } from 'react-router-dom';
 import { apiRequest, firstError, queryString } from '../api';
 import DataTable from '../components/DataTable';

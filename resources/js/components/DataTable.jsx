@@ -1,6 +1,6 @@
 import React from 'react';
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { Skeleton, SkeletonItem } from '@fluentui/react-components';
+import { Skeleton, SkeletonItem } from '../ui';
 
 export default function DataTable({ columns, data = [], loading, emptyTitle = 'ยังไม่มีข้อมูล', emptyText = 'เพิ่มรายการใหม่เพื่อเริ่มต้นใช้งาน' }) {
     const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() });

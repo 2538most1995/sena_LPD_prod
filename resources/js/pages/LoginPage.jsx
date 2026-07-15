@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Field, Input, Spinner } from '@fluentui/react-components';
-import { BookRegular, EyeOffRegular, EyeRegular, LockClosedRegular, PersonRegular } from '@fluentui/react-icons';
+import { Button, Field, Input, Spinner } from '../ui';
+import { BookRegular, EyeOffRegular, EyeRegular, LockClosedRegular, PersonRegular } from '../ui/icons';
 import { useNavigate } from 'react-router-dom';
 import { apiRequest, firstError } from '../api';
 import { ErrorMessage } from '../components/Feedback';

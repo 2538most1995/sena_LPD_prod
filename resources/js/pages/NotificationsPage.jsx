@@ -1,7 +1,7 @@
 import React from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Card } from '@fluentui/react-components';
-import { AlertRegular, CheckmarkRegular } from '@fluentui/react-icons';
+import { Button, Card } from '../ui';
+import { AlertRegular, CheckmarkRegular } from '../ui/icons';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { apiRequest } from '../api';
 import PageHeader from '../components/PageHeader';

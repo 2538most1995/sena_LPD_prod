@@ -1,7 +1,7 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FluentProvider, Spinner } from '@fluentui/react-components';
+import { SenaProvider, Spinner } from './ui';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import AppShell from './components/AppShell';
 import { apiRequest } from './api';
@@ -66,11 +66,11 @@ function SenaApplication({ apiBase, assetsUrl, loginUrl, logoutUrl }) {
     const updateUser = (next) => client.setQueryData(['me'], { data: next });
 
     if (me.isLoading) {
-        return <FluentProvider theme={dark ? senaDarkTheme : senaLightTheme}><div className="boot-screen"><span className="brand-mark">S</span><Spinner label="กำลังเปิดระบบ Sena LPD" /></div></FluentProvider>;
+        return <SenaProvider theme={dark ? senaDarkTheme : senaLightTheme}><div className="boot-screen"><span className="brand-mark">S</span><Spinner label="กำลังเปิดระบบ Sena LPD" /></div></SenaProvider>;
     }
 
     return (
-        <FluentProvider theme={dark ? senaDarkTheme : senaLightTheme} className="fluent-root">
+        <SenaProvider theme={dark ? senaDarkTheme : senaLightTheme} className="sena-root">
           <Suspense fallback={<div className="state-panel tall"><Spinner label="กำลังเปิดหน้าใช้งาน" /></div>}>
             <Routes>
                 <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage loginUrl={loginUrl} assetsUrl={assetsUrl} onLogin={afterLogin} />} />
@@ -94,7 +94,7 @@ function SenaApplication({ apiBase, assetsUrl, loginUrl, logoutUrl }) {
                 <Route path="*" element={<Navigate to={user ? '/' : '/login'} replace />} />
             </Routes>
           </Suspense>
-        </FluentProvider>
+        </SenaProvider>
     );
 }
 

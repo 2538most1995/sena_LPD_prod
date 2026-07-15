@@ -3,10 +3,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     Button, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle,
     Field, Input, Textarea,
-} from '@fluentui/react-components';
+} from '../ui';
 import {
     AddRegular, DeleteRegular, DocumentPdfRegular, DocumentWordRegular, EditRegular, SearchRegular,
-} from '@fluentui/react-icons';
+} from '../ui/icons';
 import { useOutletContext } from 'react-router-dom';
 import { apiRequest, firstError, queryString, toFormData } from '../api';
 import DataTable from '../components/DataTable';

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Card, Field, Input, Tab, TabList } from '@fluentui/react-components';
-import { ArrowLeftRegular, DeleteRegular, DocumentPdfRegular, SaveRegular } from '@fluentui/react-icons';
+import { Button, Card, Field, Input, Tab, TabList } from '../ui';
+import { ArrowLeftRegular, DeleteRegular, DocumentPdfRegular, SaveRegular } from '../ui/icons';
 import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { apiRequest, firstError } from '../api';
 import PageHeader from '../components/PageHeader';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Button, Card, Spinner } from '@fluentui/react-components';
-import { ArrowRightRegular, ArrowSyncRegular, BookRegular, CheckmarkCircleRegular, ClipboardTaskListLtrRegular, PeopleRegular } from '@fluentui/react-icons';
+import { Button, Card, Spinner } from '../ui';
+import { ArrowRightRegular, ArrowSyncRegular, BookRegular, CheckmarkCircleRegular, ClipboardTaskListLtrRegular, PeopleRegular } from '../ui/icons';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { apiRequest } from '../api';
 import PageHeader from '../components/PageHeader';

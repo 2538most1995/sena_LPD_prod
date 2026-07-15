@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Field, Input, Spinner, Textarea } from '@fluentui/react-components';
-import { CheckmarkCircleRegular, SaveRegular, SettingsRegular } from '@fluentui/react-icons';
+import { Button, Field, Input, Spinner, Textarea } from '../ui';
+import { CheckmarkCircleRegular, SaveRegular, SettingsRegular } from '../ui/icons';
 import { useOutletContext } from 'react-router-dom';
 import { apiRequest, firstError } from '../api';
 import { ErrorMessage, SuccessMessage } from '../components/Feedback';

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { Avatar, Button, Field, Input } from '@fluentui/react-components';
-import { SaveRegular } from '@fluentui/react-icons';
+import { Avatar, Button, Field, Input } from '../ui';
+import { SaveRegular } from '../ui/icons';
 import { useOutletContext } from 'react-router-dom';
 import { apiRequest, firstError, toFormData } from '../api';
 import PageHeader from '../components/PageHeader';

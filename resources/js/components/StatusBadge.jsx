@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '@fluentui/react-components';
+import { Badge } from '../ui';
 
 const appearances = {
     approved: ['filled', 'success', 'อนุมัติแล้ว'],

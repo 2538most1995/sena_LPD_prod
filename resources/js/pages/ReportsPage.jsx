@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Button, Card, Field } from '@fluentui/react-components';
-import { DocumentBulletListRegular, OpenRegular } from '@fluentui/react-icons';
+import { Button, Card, Field } from '../ui';
+import { DocumentBulletListRegular, OpenRegular } from '../ui/icons';
 import { useOutletContext } from 'react-router-dom';
 import { apiRequest } from '../api';
 import PageHeader from '../components/PageHeader';
@@ -39,7 +39,7 @@ export default function ReportsPage() {
     return <>
         <PageHeader eyebrow="เอกสารทางราชการ" title="เอกสารและรายงาน PDF" description="สร้างแบบฟอร์ม พต. และเอกสารประกอบจากข้อมูลจริงของกลุ่มกิจกรรม" actions={<Button icon={<DocumentBulletListRegular />} onClick={() => openReport('blank', 0, false)}>แบบฟอร์มเปล่า พต.1 ถึง พต.22</Button>} />
         <section className="report-selector content-card"><Field label="เลือกกลุ่มกิจกรรมที่ต้องการสร้างเอกสาร"><select className="native-select" value={projectId} onChange={(event) => setProjectId(event.target.value)}><option value="">เลือกกลุ่มกิจกรรม</option>{projects.data?.data?.map((project) => <option key={project.id} value={project.id}>{project.title} · {project.course?.name}</option>)}</select></Field></section>
-        <section className="report-section"><div className="section-heading"><h2>แบบฟอร์ม พต.1 ถึง พต.22</h2><span>{ptReports.length} แบบฟอร์ม</span></div><div className="report-grid">{ptReports.map((title, index) => <Card key={title} className="report-card"><span>{String(index + 1).padStart(2, '0')}</span><strong>{title}</strong><Button appearance="subtle" icon={<OpenRegular />} onClick={() => openReport('pt', index)}>เปิด PDF</Button></Card>)}</div></section>
-        <section className="report-section"><div className="section-heading"><h2>เอกสารประกอบกิจกรรม</h2><span>{specialReports.length} รายการ</span></div><div className="report-grid">{specialReports.map(([type, doc, title], index) => <Card key={title} className="report-card"><span>{String(index + 1).padStart(2, '0')}</span><strong>{title}</strong><Button appearance="subtle" icon={<OpenRegular />} onClick={() => openReport(type, doc)}>เปิด PDF</Button></Card>)}</div></section>
+        <section className="report-section"><div className="section-heading"><h2>แบบฟอร์ม พต.1 ถึง พต.22</h2><span>{ptReports.length} แบบฟอร์ม</span></div><div className="report-grid">{ptReports.map((title, index) => <Card key={title} className="report-card" style={{ '--index': index % 6 }}><span>{String(index + 1).padStart(2, '0')}</span><strong>{title}</strong><Button appearance="subtle" icon={<OpenRegular />} onClick={() => openReport('pt', index)}>เปิด PDF</Button></Card>)}</div></section>
+        <section className="report-section"><div className="section-heading"><h2>เอกสารประกอบกิจกรรม</h2><span>{specialReports.length} รายการ</span></div><div className="report-grid">{specialReports.map(([type, doc, title], index) => <Card key={title} className="report-card" style={{ '--index': index % 6 }}><span>{String(index + 1).padStart(2, '0')}</span><strong>{title}</strong><Button appearance="subtle" icon={<OpenRegular />} onClick={() => openReport(type, doc)}>เปิด PDF</Button></Card>)}</div></section>
     </>;
 }

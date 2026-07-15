@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Card, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, Field, Tab, TabList, Textarea } from '@fluentui/react-components';
-import { CheckmarkCircleRegular, DocumentPdfRegular, DocumentWordRegular, DismissCircleRegular } from '@fluentui/react-icons';
+import { Button, Card, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, Field, Tab, TabList, Textarea } from '../ui';
+import { CheckmarkCircleRegular, DocumentPdfRegular, DocumentWordRegular, DismissCircleRegular } from '../ui/icons';
 import { useOutletContext } from 'react-router-dom';
 import { apiRequest, firstError } from '../api';
 import PageHeader from '../components/PageHeader';

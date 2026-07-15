@@ -1,1 +1,0 @@
-import{n as e}from"./rolldown-runtime-Bh1tDfsg.js";import{V as t}from"./api-CvM9ddt_.js";var n=e(t());function r(e,t){let r=n.useRef(void 0),i=n.useCallback((n,i)=>(r.current!==void 0&&t(r.current),r.current=e(n,i),r.current),[t,e]),a=n.useCallback(()=>{r.current!==void 0&&(t(r.current),r.current=void 0)},[t]);return n.useEffect(()=>a,[a]),[i,a]}export{r as t};
