@@ -1,4 +1,7 @@
 *
 !private/
 !public/
+!templates/
+templates/*
+!templates/student_import_template.xlsx
 !.gitignore

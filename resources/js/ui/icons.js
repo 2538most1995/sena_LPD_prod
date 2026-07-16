@@ -18,6 +18,7 @@ export { default as DismissRegular } from '@mui/icons-material/CloseRounded';
 export { default as DocumentBulletListRegular } from '@mui/icons-material/DescriptionOutlined';
 export { default as DocumentPdfRegular } from '@mui/icons-material/PictureAsPdfOutlined';
 export { default as DocumentWordRegular } from '@mui/icons-material/ArticleOutlined';
+export { default as DownloadRegular } from '@mui/icons-material/FileDownloadOutlined';
 export { default as EditRegular } from '@mui/icons-material/EditRounded';
 export { default as EyeOffRegular } from '@mui/icons-material/VisibilityOffOutlined';
 export { default as EyeRegular } from '@mui/icons-material/VisibilityOutlined';

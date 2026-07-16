@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\ReferenceDataController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\StudentImportController;
 use App\Http\Controllers\Api\SystemStatusController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +58,8 @@ Route::prefix('v1')->group(function (): void {
         Route::delete('/projects/{project}/photos/{photo}', [ProjectActivityController::class, 'deletePhoto']);
         Route::get('/projects/{project}/photos/{photo}/file', [ProjectActivityController::class, 'photoFile'])->name('api.projects.photos.file');
 
+        Route::get('/students/import-template', [StudentImportController::class, 'template']);
+        Route::post('/students/import', [StudentImportController::class, 'import']);
         Route::apiResource('students', StudentController::class)->except(['show']);
         Route::apiResource('lecturers', LecturerController::class)->except(['show']);
         Route::get('/users', [UserController::class, 'index']);

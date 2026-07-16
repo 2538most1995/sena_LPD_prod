@@ -123,6 +123,12 @@ class AccessScope
         return $user->role === 'super_admin' || (int) $user->id === (int) $ownerId;
     }
 
+    public function canViewOwned(User $user, int|string|null $ownerId): bool
+    {
+        return $user->role === 'super_admin'
+            || $this->ownerIds($user)->contains((int) $ownerId);
+    }
+
     public function canViewCourse(User $user, Course $course): bool
     {
         if ($this->canEditOwned($user, $course->created_by)) {

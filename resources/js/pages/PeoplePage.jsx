@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, Field, Input, Textarea } from '../ui';
-import { AddRegular, DeleteRegular, EditRegular, SearchRegular } from '../ui/icons';
+import { AddRegular, DeleteRegular, DownloadRegular, EditRegular, SearchRegular, UploadRegular } from '../ui/icons';
 import { useOutletContext } from 'react-router-dom';
 import { apiRequest, firstError, queryString } from '../api';
 import DataTable from '../components/DataTable';
@@ -20,6 +20,8 @@ export default function PeoplePage({ type }) {
     const [form, setForm] = useState(isStudent ? studentEmpty : lecturerEmpty);
     const [feedback, setFeedback] = useState('');
     const [error, setError] = useState('');
+    const [importOpen, setImportOpen] = useState(false);
+    const [importFile, setImportFile] = useState(null);
     const query = useQuery({ queryKey: [type, search], queryFn: () => apiRequest(`${apiBase}/${type}${queryString({ search, per_page: 100 })}`) });
     const save = useMutation({
         mutationFn: () => apiRequest(dialog?.id ? `${apiBase}/${type}/${dialog.id}` : `${apiBase}/${type}`, { method: dialog?.id ? 'PUT' : 'POST', body: form }),
@@ -29,6 +31,23 @@ export default function PeoplePage({ type }) {
     const remove = useMutation({
         mutationFn: (id) => apiRequest(`${apiBase}/${type}/${id}`, { method: 'DELETE' }),
         onSuccess: (result) => { queryClient.invalidateQueries({ queryKey: [type] }); setFeedback(result.message); },
+        onError: (requestError) => setError(firstError(requestError)),
+    });
+    const importStudents = useMutation({
+        mutationFn: () => {
+            const body = new FormData();
+            body.append('file', importFile);
+            return apiRequest(`${apiBase}/students/import`, { method: 'POST', body });
+        },
+        onSuccess: (result) => {
+            queryClient.invalidateQueries({ queryKey: ['students'] });
+            queryClient.invalidateQueries({ queryKey: ['references'] });
+            queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+            setImportOpen(false);
+            setImportFile(null);
+            setFeedback(result.message);
+            setError('');
+        },
         onError: (requestError) => setError(firstError(requestError)),
     });
     const openCreate = () => { setForm({ ...(isStudent ? studentEmpty : lecturerEmpty) }); setDialog({}); setError(''); };
@@ -43,15 +62,15 @@ export default function PeoplePage({ type }) {
     const canManage = (person) => user.role === 'super_admin' || Number(person.created_by) === Number(user.id);
     const columns = useMemo(() => [
         { header: 'ชื่อและนามสกุล', cell: ({ row }) => <div className="primary-cell"><strong>{row.original.prefix}{row.original.first_name} {row.original.last_name}</strong><span>เลขบัตร {row.original.id_card}</span></div> },
-        ...(isStudent && user.role !== 'subdistrict_admin' ? [{ header: 'หน่วยงาน', cell: ({ row }) => row.original.creator?.school_name || 'ข้อมูลเดิมไม่ระบุหน่วยงาน' }] : []),
+        ...(user.role !== 'subdistrict_admin' ? [{ header: 'หน่วยงาน', cell: ({ row }) => row.original.creator?.school_name || 'ข้อมูลเดิมไม่ระบุหน่วยงาน' }] : []),
         { header: isStudent ? 'กลุ่มเป้าหมาย' : 'ความเชี่ยวชาญ', accessorKey: isStudent ? 'target_group' : 'expertise' },
         { header: 'อาชีพ', accessorKey: 'career' },
         { header: 'โทรศัพท์', accessorKey: 'phone' },
-        { header: '', id: 'actions', cell: ({ row }) => <div className="row-actions">{!isStudent || canManage(row.original) ? <><Button appearance="subtle" icon={<EditRegular />} aria-label="แก้ไข" onClick={() => openEdit(row.original)} /><Button appearance="subtle" icon={<DeleteRegular />} aria-label="ลบ" onClick={() => window.confirm(`ยืนยันลบ ${row.original.first_name} ${row.original.last_name}`) && remove.mutate(row.original.id)} /></> : <span className="muted-text">ดูข้อมูลเท่านั้น</span>}</div> },
+        { header: '', id: 'actions', cell: ({ row }) => <div className="row-actions">{canManage(row.original) ? <><Button appearance="subtle" icon={<EditRegular />} aria-label="แก้ไข" onClick={() => openEdit(row.original)} /><Button appearance="subtle" icon={<DeleteRegular />} aria-label="ลบ" onClick={() => window.confirm(`ยืนยันลบ ${row.original.first_name} ${row.original.last_name}`) && remove.mutate(row.original.id)} /></> : <span className="muted-text">ดูข้อมูลเท่านั้น</span>}</div> },
     ], [isStudent, user.id, user.role]);
 
     return <>
-        <PageHeader eyebrow={isStudent ? 'ฐานข้อมูลผู้รับบริการ' : 'ทะเบียนบุคลากร'} title={isStudent ? 'ผู้เรียน' : 'วิทยากร'} description={isStudent ? (user.role === 'subdistrict_admin' ? 'ข้อมูลผู้เรียนของตำบลนี้ สำหรับลงทะเบียนเข้ากลุ่มกิจกรรมของหน่วยงาน' : 'ภาพรวมข้อมูลผู้เรียน แยกตามตำบลและหน่วยงานเจ้าของข้อมูล') : 'จัดเก็บข้อมูลวิทยากร ความเชี่ยวชาญ และประวัติการสอน'} actions={<Button appearance="primary" icon={<AddRegular />} onClick={openCreate}>เพิ่ม{isStudent ? 'ผู้เรียน' : 'วิทยากร'}</Button>} />
+        <PageHeader eyebrow={isStudent ? 'ฐานข้อมูลผู้รับบริการ' : 'ทะเบียนบุคลากร'} title={isStudent ? 'ผู้เรียน' : 'วิทยากร'} description={isStudent ? (user.role === 'subdistrict_admin' ? 'ข้อมูลผู้เรียนของตำบลนี้ สำหรับลงทะเบียนเข้ากลุ่มกิจกรรมของหน่วยงาน' : 'ภาพรวมข้อมูลผู้เรียน แยกตามตำบลและหน่วยงานเจ้าของข้อมูล') : (user.role === 'subdistrict_admin' ? 'ข้อมูลวิทยากรของตำบลนี้ สำหรับเลือกใช้ในกลุ่มกิจกรรมของหน่วยงาน' : 'ภาพรวมข้อมูลวิทยากร แยกตามตำบลและหน่วยงานเจ้าของข้อมูล')} actions={<>{isStudent ? <><Button component="a" href={`${apiBase}/students/import-template`} appearance="secondary" icon={<DownloadRegular />}>ดาวน์โหลดเทมเพลต</Button><Button appearance="secondary" icon={<UploadRegular />} onClick={() => { setImportOpen(true); setImportFile(null); setError(''); }}>นำเข้า Excel</Button></> : null}<Button appearance="primary" icon={<AddRegular />} onClick={openCreate}>เพิ่ม{isStudent ? 'ผู้เรียน' : 'วิทยากร'}</Button></>} />
         <SuccessMessage message={feedback} /><ErrorMessage message={error || query.error?.message} />
         <section className="content-card"><div className="filter-row"><Input contentBefore={<SearchRegular />} placeholder={`ค้นหา${isStudent ? 'ผู้เรียน' : 'วิทยากร'} ชื่อ เลขบัตร หรือโทรศัพท์`} value={search} onChange={(_, data) => setSearch(data.value)} /><span>{query.data?.total ?? 0} รายการ</span></div><DataTable columns={columns} data={query.data?.data ?? []} loading={query.isLoading} emptyTitle={`ยังไม่มี${isStudent ? 'ผู้เรียน' : 'วิทยากร'}`} /></section>
         <Dialog open={dialog !== null} onOpenChange={(_, data) => !data.open && setDialog(null)}><DialogSurface className="wide-dialog"><form onSubmit={(event) => { event.preventDefault(); save.mutate(); }}><DialogBody><DialogTitle>{dialog?.id ? 'แก้ไข' : 'เพิ่ม'}{isStudent ? 'ผู้เรียน' : 'วิทยากร'}</DialogTitle><DialogContent className="form-stack scroll-form"><ErrorMessage message={error} />
@@ -63,5 +82,6 @@ export default function PeoplePage({ type }) {
             {isStudent ? <Field label="รายได้ต่อปี"><Input type="number" min="0" value={String(form.annual_income)} onChange={(_, data) => update('annual_income', data.value)} /></Field> : null}
             <Field label="ที่อยู่"><Textarea rows={3} value={form.address} onChange={(_, data) => update('address', data.value)} /></Field>
         </DialogContent><DialogActions><Button type="button" onClick={() => setDialog(null)}>ยกเลิก</Button><Button type="submit" appearance="primary" disabled={save.isPending}>{save.isPending ? 'กำลังบันทึก' : 'บันทึกข้อมูล'}</Button></DialogActions></DialogBody></form></DialogSurface></Dialog>
+        <Dialog open={isStudent && importOpen} onOpenChange={(_, data) => !data.open && setImportOpen(false)}><DialogSurface className="wide-dialog"><form onSubmit={(event) => { event.preventDefault(); importStudents.mutate(); }}><DialogBody><DialogTitle>นำเข้าผู้เรียนจาก Excel</DialogTitle><DialogContent className="form-stack"><p className="import-dialog-intro">ใช้ไฟล์เทมเพลตของระบบ กรอกข้อมูลไม่เกิน 1,000 รายการ แล้วอัปโหลดไฟล์กลับเข้ามา ระบบจะตรวจสอบทุกแถวก่อนบันทึก</p><ErrorMessage message={error} /><Field label="ไฟล์ Excel (.xlsx, .xls)" required hint={importFile ? `ไฟล์ที่เลือก: ${importFile.name}` : 'ขนาดไฟล์ไม่เกิน 5 MB'}><input className="native-file" type="file" accept=".xlsx,.xls" required onChange={(event) => setImportFile(event.target.files[0] ?? null)} /></Field><Button component="a" href={`${apiBase}/students/import-template`} appearance="secondary" icon={<DownloadRegular />}>ดาวน์โหลดเทมเพลตใหม่</Button></DialogContent><DialogActions><Button type="button" onClick={() => setImportOpen(false)}>ยกเลิก</Button><Button type="submit" appearance="primary" icon={<UploadRegular />} disabled={!importFile || importStudents.isPending}>{importStudents.isPending ? 'กำลังตรวจสอบและนำเข้า' : 'เริ่มนำเข้าข้อมูล'}</Button></DialogActions></DialogBody></form></DialogSurface></Dialog>
     </>;
 }

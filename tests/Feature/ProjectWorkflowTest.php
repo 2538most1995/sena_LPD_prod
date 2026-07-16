@@ -31,6 +31,7 @@ class ProjectWorkflowTest extends TestCase
             'approval_status' => 'approved',
         ]);
         $lecturer = Lecturer::query()->create([
+            'created_by' => $subdistrict->id,
             'prefix' => 'นางสาว', 'first_name' => 'วิทยา', 'last_name' => 'ทดสอบ',
             'id_card' => '1111111111111', 'expertise' => 'งานอาชีพ',
         ]);

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Course;
 use App\Models\LearningProject;
+use App\Models\Lecturer;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -107,6 +108,44 @@ class DataVisibilityScopeTest extends TestCase
             'student_ids' => [$otherStudent->id],
         ])->assertUnprocessable()
             ->assertJsonPath('message', 'พบผู้เรียนที่ไม่ได้อยู่ในหน่วยงานเจ้าของกลุ่ม');
+    }
+
+    public function test_lecturers_are_isolated_by_subdistrict_and_visible_to_the_district(): void
+    {
+        $district = $this->user('DISTRICT-ONE', 'district_admin');
+        $firstSubdistrict = $this->user('SUBDISTRICT-ONE', 'subdistrict_admin', $district->id);
+        $secondSubdistrict = $this->user('SUBDISTRICT-TWO', 'subdistrict_admin', $district->id);
+        $firstLecturer = Lecturer::query()->create([
+            'created_by' => $firstSubdistrict->id,
+            'prefix' => 'นาย', 'first_name' => 'วิทยากรหนึ่ง', 'last_name' => 'ทดสอบ',
+            'id_card' => '4111111111111', 'expertise' => 'งานอาชีพ',
+        ]);
+        $secondLecturer = Lecturer::query()->create([
+            'created_by' => $secondSubdistrict->id,
+            'prefix' => 'นาง', 'first_name' => 'วิทยากรสอง', 'last_name' => 'ทดสอบ',
+            'id_card' => '4222222222222', 'expertise' => 'งานดิจิทัล',
+        ]);
+
+        $this->actingAs($firstSubdistrict)->getJson('/api/v1/lecturers?per_page=100')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $firstLecturer->id);
+
+        $this->actingAs($firstSubdistrict)->getJson('/api/v1/references')
+            ->assertOk()
+            ->assertJsonCount(1, 'data.lecturers')
+            ->assertJsonPath('data.lecturers.0.id', $firstLecturer->id);
+
+        $this->actingAs($district)->getJson('/api/v1/lecturers?per_page=100')
+            ->assertOk()
+            ->assertJsonCount(2, 'data')
+            ->assertJsonFragment(['id' => $firstLecturer->id])
+            ->assertJsonFragment(['id' => $secondLecturer->id]);
+
+        $this->actingAs($firstSubdistrict)->putJson("/api/v1/lecturers/{$secondLecturer->id}", [
+            'prefix' => 'นาง', 'first_name' => 'แก้ไขข้ามตำบล', 'last_name' => 'ทดสอบ',
+            'id_card' => '4222222222222', 'expertise' => 'งานดิจิทัล',
+        ])->assertForbidden();
     }
 
     private function course(User $owner, string $name, string $status): Course

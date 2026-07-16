@@ -7,6 +7,7 @@ use App\Http\Requests\ReviewRequest;
 use App\Http\Requests\SaveProjectRequest;
 use App\Models\Course;
 use App\Models\LearningProject;
+use App\Models\Lecturer;
 use App\Models\User;
 use App\Services\AccessScope;
 use App\Services\AuditService;
@@ -102,6 +103,8 @@ class ProjectController extends Controller
         $user = $request->user();
         $course = Course::query()->findOrFail($request->integer('course_id'));
         $this->authorize('view', $course);
+        $lecturer = Lecturer::query()->findOrFail($request->integer('lecturer_id'));
+        $this->authorize('view', $lecturer);
         if ($course->approval_status !== 'approved') {
             return response()->json(['message' => 'หลักสูตรนี้ยังไม่ได้รับอนุมัติ'], 422);
         }
@@ -137,6 +140,8 @@ class ProjectController extends Controller
         $user = $request->user();
         $course = Course::query()->findOrFail($request->integer('course_id'));
         $this->authorize('view', $course);
+        $lecturer = Lecturer::query()->findOrFail($request->integer('lecturer_id'));
+        $this->authorize('view', $lecturer);
         if ($course->approval_status !== 'approved') {
             return response()->json(['message' => 'หลักสูตรนี้ยังไม่ได้รับอนุมัติ'], 422);
         }

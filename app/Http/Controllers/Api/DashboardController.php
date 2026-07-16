@@ -28,7 +28,7 @@ class DashboardController extends Controller
                 'courses' => (clone $courses)->count(),
                 'projects' => (clone $projects)->count(),
                 'students' => $this->scope->owned(Student::query(), $user)->count(),
-                'lecturers' => Lecturer::query()->count(),
+                'lecturers' => $this->scope->owned(Lecturer::query(), $user)->count(),
                 'subdistricts' => $user->role === 'super_admin'
                     ? User::query()->active()->where('role', 'subdistrict_admin')->count()
                     : $user->children()->active()->count(),

@@ -241,6 +241,7 @@ button { -webkit-tap-highlight-color: transparent; }
 .native-file { padding: 7px 9px; }
 .file-pair { display: grid; padding: 18px; grid-template-columns: 1fr 1fr; gap: 16px; border: 1px dashed color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: var(--radius-md); background: var(--accent-softer); }
 .form-note { margin: -5px 0 0; color: var(--muted); font-size: 11px; }
+.import-dialog-intro { margin: 0; padding: 13px 15px; border-left: 3px solid var(--highlight); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; color: var(--muted); background: var(--highlight-soft); font-size: 13px; line-height: 1.65; }
 .cost-box { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-2); }
 .cost-box legend { padding: 0 8px; color: var(--muted); font-size: 12px; font-weight: 700; }
 .form-submit { display: flex; justify-content: flex-end; }
