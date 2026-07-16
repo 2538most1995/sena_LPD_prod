@@ -101,8 +101,8 @@
     "file": "assets/api-KUhIv0LF.js",
     "name": "api"
   },
-  "_useMutation-Df5fKHJ0.js": {
-    "file": "assets/useMutation-Df5fKHJ0.js",
+  "_useMutation-AwMGsxsz.js": {
+    "file": "assets/useMutation-AwMGsxsz.js",
     "name": "useMutation",
     "imports": [
       "_api-KUhIv0LF.js",
@@ -110,7 +110,7 @@
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-BijABPWN.css",
+    "file": "assets/app-gwefyXON.css",
     "name": "app",
     "names": [
       "app.css"
@@ -136,7 +136,7 @@
     "src": "resources/fonts/noto-sans-thai-thai-700-normal.woff2"
   },
   "resources/js/app.jsx": {
-    "file": "assets/app-BfjL1HV1.js",
+    "file": "assets/app-DSoGsoTy.js",
     "name": "app",
     "src": "resources/js/app.jsx",
     "isEntry": true,
@@ -160,13 +160,13 @@
     ]
   },
   "resources/js/pages/ApprovalsPage.jsx": {
-    "file": "assets/ApprovalsPage-CL6lRA4d.js",
+    "file": "assets/ApprovalsPage-DdOzDHAV.js",
     "name": "ApprovalsPage",
     "src": "resources/js/pages/ApprovalsPage.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_api-KUhIv0LF.js",
-      "_useMutation-Df5fKHJ0.js",
+      "_useMutation-AwMGsxsz.js",
       "_PictureAsPdfOutlined-DLAlEQEr.js",
       "_ArticleOutlined-BCzXEWht.js",
       "resources/js/app.jsx",
@@ -176,7 +176,7 @@
     ]
   },
   "resources/js/pages/AuditPage.jsx": {
-    "file": "assets/AuditPage-BxC-22V-.js",
+    "file": "assets/AuditPage-D9y5QmMr.js",
     "name": "AuditPage",
     "src": "resources/js/pages/AuditPage.jsx",
     "isDynamicEntry": true,
@@ -189,13 +189,13 @@
     ]
   },
   "resources/js/pages/CoursesPage.jsx": {
-    "file": "assets/CoursesPage-D0MW5X2j.js",
+    "file": "assets/CoursesPage-CHZ-6tUT.js",
     "name": "CoursesPage",
     "src": "resources/js/pages/CoursesPage.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_api-KUhIv0LF.js",
-      "_useMutation-Df5fKHJ0.js",
+      "_useMutation-AwMGsxsz.js",
       "_EditRounded-Bvdi1Sqp.js",
       "_DeleteOutlineRounded-D3H_DgsV.js",
       "_PictureAsPdfOutlined-DLAlEQEr.js",
@@ -209,7 +209,7 @@
     ]
   },
   "resources/js/pages/DashboardPage.jsx": {
-    "file": "assets/DashboardPage-4_6OOT0J.js",
+    "file": "assets/DashboardPage-BYnAaIU4.js",
     "name": "DashboardPage",
     "src": "resources/js/pages/DashboardPage.jsx",
     "isDynamicEntry": true,
@@ -222,13 +222,13 @@
     ]
   },
   "resources/js/pages/DocumentSettingsPage.jsx": {
-    "file": "assets/DocumentSettingsPage-CY5By-7o.js",
+    "file": "assets/DocumentSettingsPage-H5vcLU-x.js",
     "name": "DocumentSettingsPage",
     "src": "resources/js/pages/DocumentSettingsPage.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_api-KUhIv0LF.js",
-      "_useMutation-Df5fKHJ0.js",
+      "_useMutation-AwMGsxsz.js",
       "_SaveOutlined-CldpKOP7.js",
       "resources/js/app.jsx",
       "_PageHeader-CVZX5fUn.js",
@@ -236,7 +236,7 @@
     ]
   },
   "resources/js/pages/LoginPage.jsx": {
-    "file": "assets/LoginPage-C3VGlX3b.js",
+    "file": "assets/LoginPage-CLnvuKFr.js",
     "name": "LoginPage",
     "src": "resources/js/pages/LoginPage.jsx",
     "isDynamicEntry": true,
@@ -249,26 +249,26 @@
     ]
   },
   "resources/js/pages/NotificationsPage.jsx": {
-    "file": "assets/NotificationsPage-ClmSfQXR.js",
+    "file": "assets/NotificationsPage-Cjt9ShHU.js",
     "name": "NotificationsPage",
     "src": "resources/js/pages/NotificationsPage.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_api-KUhIv0LF.js",
-      "_useMutation-Df5fKHJ0.js",
+      "_useMutation-AwMGsxsz.js",
       "resources/js/app.jsx",
       "_PageHeader-CVZX5fUn.js",
       "_Feedback-BF-Bjq6t.js"
     ]
   },
   "resources/js/pages/PeoplePage.jsx": {
-    "file": "assets/PeoplePage-CaOTDCsV.js",
+    "file": "assets/PeoplePage-j426-9Ji.js",
     "name": "PeoplePage",
     "src": "resources/js/pages/PeoplePage.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_api-KUhIv0LF.js",
-      "_useMutation-Df5fKHJ0.js",
+      "_useMutation-AwMGsxsz.js",
       "_EditRounded-Bvdi1Sqp.js",
       "_DeleteOutlineRounded-D3H_DgsV.js",
       "_SearchRounded-Cq2lIVw6.js",
@@ -279,13 +279,13 @@
     ]
   },
   "resources/js/pages/ProfilePage.jsx": {
-    "file": "assets/ProfilePage-B_WMyFYo.js",
+    "file": "assets/ProfilePage-9oG8ZXLK.js",
     "name": "ProfilePage",
     "src": "resources/js/pages/ProfilePage.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_api-KUhIv0LF.js",
-      "_useMutation-Df5fKHJ0.js",
+      "_useMutation-AwMGsxsz.js",
       "_PhotoCameraOutlined-CbHWG7j6.js",
       "_LockOutlined-i6sbxjfd.js",
       "_SaveOutlined-CldpKOP7.js",
@@ -295,13 +295,13 @@
     ]
   },
   "resources/js/pages/ProjectWorkspacePage.jsx": {
-    "file": "assets/ProjectWorkspacePage-C4eJ73j7.js",
+    "file": "assets/ProjectWorkspacePage-D6nXSpGG.js",
     "name": "ProjectWorkspacePage",
     "src": "resources/js/pages/ProjectWorkspacePage.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_api-KUhIv0LF.js",
-      "_useMutation-Df5fKHJ0.js",
+      "_useMutation-AwMGsxsz.js",
       "_DescriptionOutlined-odL65i43.js",
       "_PhotoCameraOutlined-CbHWG7j6.js",
       "_DeleteOutlineRounded-D3H_DgsV.js",
@@ -315,13 +315,13 @@
     ]
   },
   "resources/js/pages/ProjectsPage.jsx": {
-    "file": "assets/ProjectsPage-Y5j6GZ0o.js",
+    "file": "assets/ProjectsPage-BVD2PIKn.js",
     "name": "ProjectsPage",
     "src": "resources/js/pages/ProjectsPage.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_api-KUhIv0LF.js",
-      "_useMutation-Df5fKHJ0.js",
+      "_useMutation-AwMGsxsz.js",
       "_EditRounded-Bvdi1Sqp.js",
       "_DeleteOutlineRounded-D3H_DgsV.js",
       "_VisibilityOutlined-Dka8VCcE.js",
@@ -334,7 +334,7 @@
     ]
   },
   "resources/js/pages/ReportsPage.jsx": {
-    "file": "assets/ReportsPage-Bh2kV44B.js",
+    "file": "assets/ReportsPage-C_tb6D7G.js",
     "name": "ReportsPage",
     "src": "resources/js/pages/ReportsPage.jsx",
     "isDynamicEntry": true,
@@ -350,13 +350,13 @@
     ]
   },
   "resources/js/pages/UsersPage.jsx": {
-    "file": "assets/UsersPage-Ba2YY97R.js",
+    "file": "assets/UsersPage-CTc64Cpg.js",
     "name": "UsersPage",
     "src": "resources/js/pages/UsersPage.jsx",
     "isDynamicEntry": true,
     "imports": [
       "_api-KUhIv0LF.js",
-      "_useMutation-Df5fKHJ0.js",
+      "_useMutation-AwMGsxsz.js",
       "_EditRounded-Bvdi1Sqp.js",
       "_DeleteOutlineRounded-D3H_DgsV.js",
       "_SearchRounded-Cq2lIVw6.js",

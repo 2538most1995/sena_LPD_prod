@@ -37,25 +37,23 @@ export default function ReportsPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [search, setSearch] = useState('');
-    const [status, setStatus] = useState('all');
     const projectId = searchParams.get('project') || '';
     const projects = useQuery({ queryKey: ['projects', 'report-list'], queryFn: () => apiRequest(`${apiBase}/projects?per_page=100`) });
     const selectedProject = projects.data?.data?.find((project) => String(project.id) === String(projectId));
     const visibleProjects = useMemo(() => {
         const term = search.trim().toLocaleLowerCase('th-TH');
         return (projects.data?.data ?? []).filter((project) => {
-            const matchesStatus = status === 'all' || project.approval_status === status;
             const haystack = `${project.title} ${project.course?.name ?? ''} ${project.place ?? ''}`.toLocaleLowerCase('th-TH');
-            return matchesStatus && (!term || haystack.includes(term));
+            return !term || haystack.includes(term);
         });
-    }, [projects.data, search, status]);
+    }, [projects.data, search]);
 
     const groupedProjects = useMemo(() => [
         ['approved', 'พร้อมจัดทำเอกสาร', 'กลุ่มที่อนุมัติแล้วและพร้อมสร้างเอกสารจากข้อมูลจริง'],
         ['pending', 'รอการอนุมัติ', 'ตรวจสอบข้อมูลได้ แต่ควรรอการอนุมัติก่อนใช้เอกสาร'],
         ['revision', 'ส่งกลับแก้ไข', 'แก้ไขรายละเอียดกลุ่มแล้วส่งให้อำเภอพิจารณาอีกครั้ง'],
     ].map(([key, title, description]) => ({ key, title, description, items: visibleProjects.filter((project) => project.approval_status === key) }))
-        .filter((group) => status === 'all' ? group.items.length > 0 : group.key === status), [visibleProjects, status]);
+        .filter((group) => group.items.length > 0), [visibleProjects]);
 
     const openReport = (type, doc, needsProject = true) => {
         if (needsProject && !selectedProject) return;
@@ -105,9 +103,6 @@ export default function ReportsPage() {
             <ErrorMessage message={projects.error?.message} />
             <section className="report-manager-toolbar content-card">
                 <div><Input contentBefore={<SearchRegular />} placeholder="ค้นหาชื่อกลุ่ม หลักสูตร หรือสถานที่" value={search} onChange={(_, data) => setSearch(data.value)} /></div>
-                <div className="report-status-filter">
-                    {[['all', 'ทั้งหมด'], ['approved', 'อนุมัติแล้ว'], ['pending', 'รออนุมัติ'], ['revision', 'ส่งกลับแก้ไข']].map(([value, label]) => <button key={value} type="button" className={status === value ? 'is-active' : ''} onClick={() => setStatus(value)}>{label}</button>)}
-                </div>
                 <span>{visibleProjects.length} กลุ่ม</span>
             </section>
 
@@ -125,7 +120,7 @@ export default function ReportsPage() {
                         </Card>
                     ))}</div>
                 </section>
-            )) : <section className="state-panel empty-state content-card"><strong>ไม่พบกลุ่มกิจกรรม</strong><span>ลองเปลี่ยนคำค้นหาหรือตัวกรองสถานะ หรือสร้างกลุ่มกิจกรรมใหม่</span></section>}
+            )) : <section className="state-panel empty-state content-card"><strong>ไม่พบกลุ่มกิจกรรม</strong><span>ลองเปลี่ยนคำค้นหา หรือตรวจสอบรายการในหน้าจัดตั้งกลุ่ม</span></section>}
         </>
     );
 }
