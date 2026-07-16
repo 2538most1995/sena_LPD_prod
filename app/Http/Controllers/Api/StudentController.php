@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SaveStudentRequest;
 use App\Models\Student;
+use App\Models\User;
+use App\Services\AccessScope;
 use App\Services\AuditService;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
@@ -12,11 +14,19 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
-    public function __construct(private readonly AuditService $audit) {}
+    public function __construct(
+        private readonly AccessScope $scope,
+        private readonly AuditService $audit,
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
-        $query = Student::query()->withCount('projects');
+        $this->authorize('viewAny', Student::class);
+        /** @var User $user */
+        $user = $request->user();
+        $query = $this->scope->owned(Student::query(), $user)
+            ->with('creator:id,school_name')
+            ->withCount('projects');
         if ($search = trim((string) $request->query('search'))) {
             $query->where(function ($builder) use ($search): void {
                 $builder->where('first_name', 'like', "%{$search}%")
@@ -32,7 +42,11 @@ class StudentController extends Controller
 
     public function store(SaveStudentRequest $request): JsonResponse
     {
-        $student = Student::query()->create($request->validated());
+        $this->authorize('create', Student::class);
+        $student = Student::query()->create([
+            ...$request->validated(),
+            'created_by' => $request->user()->id,
+        ]);
         $this->audit->record('student.created', $student, null, $student->toArray());
 
         return response()->json(['message' => 'เพิ่มผู้เรียนเรียบร้อย', 'data' => $student], 201);
@@ -40,6 +54,7 @@ class StudentController extends Controller
 
     public function update(SaveStudentRequest $request, Student $student): JsonResponse
     {
+        $this->authorize('update', $student);
         $before = $student->toArray();
         $student->update($request->validated());
         $this->audit->record('student.updated', $student, $before, $student->fresh()->toArray());
@@ -49,6 +64,7 @@ class StudentController extends Controller
 
     public function destroy(Student $student): JsonResponse
     {
+        $this->authorize('delete', $student);
         if ($student->projects()->exists()) {
             return response()->json(['message' => 'ไม่สามารถลบผู้เรียนที่มีประวัติเข้าร่วมกิจกรรม'], 409);
         }

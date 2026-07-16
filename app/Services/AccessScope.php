@@ -45,10 +45,17 @@ class AccessScope
             return $query->whereIn('created_by', $this->ownerIds($user));
         }
 
-        return $query->where(function (Builder $builder) use ($user): void {
+        $district = $user->parent;
+        if (! $district || $district->role !== 'district_admin') {
+            return $query->where('created_by', $user->id);
+        }
+
+        $libraryOwnerIds = $this->ownerIds($district);
+
+        return $query->where(function (Builder $builder) use ($user, $libraryOwnerIds): void {
             $builder->where('created_by', $user->id)
-                ->orWhere(function (Builder $parent) use ($user): void {
-                    $parent->where('created_by', $user->parent_id)
+                ->orWhere(function (Builder $library) use ($libraryOwnerIds): void {
+                    $library->whereIn('created_by', $libraryOwnerIds)
                         ->where('approval_status', 'approved');
                 });
         });
@@ -126,9 +133,15 @@ class AccessScope
             return true;
         }
 
-        return $user->role === 'subdistrict_admin'
-            && (int) $course->created_by === (int) $user->parent_id
-            && $course->approval_status === 'approved';
+        if ($user->role !== 'subdistrict_admin' || $course->approval_status !== 'approved') {
+            return false;
+        }
+
+        $district = $user->parent;
+
+        return $district
+            && $district->role === 'district_admin'
+            && $this->ownerIds($district)->contains((int) $course->created_by);
     }
 
     public function canViewProject(User $user, LearningProject $project): bool

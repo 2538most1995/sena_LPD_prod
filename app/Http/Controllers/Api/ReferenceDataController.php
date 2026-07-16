@@ -24,7 +24,8 @@ class ReferenceDataController extends Controller
             'courses' => $this->scope->visibleCourses(Course::query(), $user)
                 ->where('approval_status', 'approved')->orderBy('name')->get(['id', 'name', 'hours', 'owner']),
             'lecturers' => Lecturer::query()->orderBy('first_name')->get(['id', 'prefix', 'first_name', 'last_name', 'expertise']),
-            'students' => Student::query()->orderBy('first_name')->get(['id', 'prefix', 'first_name', 'last_name', 'id_card']),
+            'students' => $this->scope->owned(Student::query(), $user)
+                ->orderBy('first_name')->get(['id', 'created_by', 'prefix', 'first_name', 'last_name', 'id_card']),
             'district_admins' => $user->role === 'super_admin'
                 ? User::query()->active()->where('role', 'district_admin')->orderBy('school_name')->get(['id', 'school_name'])
                 : collect(),

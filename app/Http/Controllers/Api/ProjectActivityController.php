@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityPhoto;
 use App\Models\LearningProject;
+use App\Models\Student;
+use App\Services\AccessScope;
 use App\Services\AuditService;
 use App\Services\LegacyStorage;
 use Illuminate\Http\JsonResponse;
@@ -16,6 +18,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class ProjectActivityController extends Controller
 {
     public function __construct(
+        private readonly AccessScope $scope,
         private readonly LegacyStorage $storage,
         private readonly AuditService $audit,
     ) {}
@@ -27,6 +30,11 @@ class ProjectActivityController extends Controller
             'student_ids' => ['present', 'array'],
             'student_ids.*' => ['integer', 'distinct', 'exists:students,id'],
         ]);
+        $allowedStudentIds = $this->scope
+            ->owned(Student::query(), $project->creator)
+            ->whereIn('id', $data['student_ids'])
+            ->pluck('id');
+        abort_unless($allowedStudentIds->count() === count($data['student_ids']), 422, 'พบผู้เรียนที่ไม่ได้อยู่ในหน่วยงานเจ้าของกลุ่ม');
         $before = $project->students()->pluck('students.id')->all();
         $project->students()->sync($data['student_ids']);
         $this->audit->record('project.participants.updated', $project, ['student_ids' => $before], $data);

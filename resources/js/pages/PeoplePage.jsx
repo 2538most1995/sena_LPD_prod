@@ -13,7 +13,7 @@ const lecturerEmpty = { prefix: 'นาย', first_name: '', last_name: '', id_c
 
 export default function PeoplePage({ type }) {
     const isStudent = type === 'students';
-    const { apiBase } = useOutletContext();
+    const { user, apiBase } = useOutletContext();
     const queryClient = useQueryClient();
     const [search, setSearch] = useState('');
     const [dialog, setDialog] = useState(null);
@@ -40,16 +40,18 @@ export default function PeoplePage({ type }) {
         setForm(next); setDialog(person); setError('');
     };
     const update = (name, value) => setForm((current) => ({ ...current, [name]: value }));
+    const canManage = (person) => user.role === 'super_admin' || Number(person.created_by) === Number(user.id);
     const columns = useMemo(() => [
         { header: 'ชื่อและนามสกุล', cell: ({ row }) => <div className="primary-cell"><strong>{row.original.prefix}{row.original.first_name} {row.original.last_name}</strong><span>เลขบัตร {row.original.id_card}</span></div> },
+        ...(isStudent && user.role !== 'subdistrict_admin' ? [{ header: 'หน่วยงาน', cell: ({ row }) => row.original.creator?.school_name || 'ข้อมูลเดิมไม่ระบุหน่วยงาน' }] : []),
         { header: isStudent ? 'กลุ่มเป้าหมาย' : 'ความเชี่ยวชาญ', accessorKey: isStudent ? 'target_group' : 'expertise' },
         { header: 'อาชีพ', accessorKey: 'career' },
         { header: 'โทรศัพท์', accessorKey: 'phone' },
-        { header: '', id: 'actions', cell: ({ row }) => <div className="row-actions"><Button appearance="subtle" icon={<EditRegular />} aria-label="แก้ไข" onClick={() => openEdit(row.original)} /><Button appearance="subtle" icon={<DeleteRegular />} aria-label="ลบ" onClick={() => window.confirm(`ยืนยันลบ ${row.original.first_name} ${row.original.last_name}`) && remove.mutate(row.original.id)} /></div> },
-    ], [isStudent]);
+        { header: '', id: 'actions', cell: ({ row }) => <div className="row-actions">{!isStudent || canManage(row.original) ? <><Button appearance="subtle" icon={<EditRegular />} aria-label="แก้ไข" onClick={() => openEdit(row.original)} /><Button appearance="subtle" icon={<DeleteRegular />} aria-label="ลบ" onClick={() => window.confirm(`ยืนยันลบ ${row.original.first_name} ${row.original.last_name}`) && remove.mutate(row.original.id)} /></> : <span className="muted-text">ดูข้อมูลเท่านั้น</span>}</div> },
+    ], [isStudent, user.id, user.role]);
 
     return <>
-        <PageHeader eyebrow={isStudent ? 'ฐานข้อมูลผู้รับบริการ' : 'ทะเบียนบุคลากร'} title={isStudent ? 'ผู้เรียน' : 'วิทยากร'} description={isStudent ? 'จัดเก็บข้อมูลผู้เรียนและนำไปลงทะเบียนเข้ากลุ่มกิจกรรม' : 'จัดเก็บข้อมูลวิทยากร ความเชี่ยวชาญ และประวัติการสอน'} actions={<Button appearance="primary" icon={<AddRegular />} onClick={openCreate}>เพิ่ม{isStudent ? 'ผู้เรียน' : 'วิทยากร'}</Button>} />
+        <PageHeader eyebrow={isStudent ? 'ฐานข้อมูลผู้รับบริการ' : 'ทะเบียนบุคลากร'} title={isStudent ? 'ผู้เรียน' : 'วิทยากร'} description={isStudent ? (user.role === 'subdistrict_admin' ? 'ข้อมูลผู้เรียนของตำบลนี้ สำหรับลงทะเบียนเข้ากลุ่มกิจกรรมของหน่วยงาน' : 'ภาพรวมข้อมูลผู้เรียน แยกตามตำบลและหน่วยงานเจ้าของข้อมูล') : 'จัดเก็บข้อมูลวิทยากร ความเชี่ยวชาญ และประวัติการสอน'} actions={<Button appearance="primary" icon={<AddRegular />} onClick={openCreate}>เพิ่ม{isStudent ? 'ผู้เรียน' : 'วิทยากร'}</Button>} />
         <SuccessMessage message={feedback} /><ErrorMessage message={error || query.error?.message} />
         <section className="content-card"><div className="filter-row"><Input contentBefore={<SearchRegular />} placeholder={`ค้นหา${isStudent ? 'ผู้เรียน' : 'วิทยากร'} ชื่อ เลขบัตร หรือโทรศัพท์`} value={search} onChange={(_, data) => setSearch(data.value)} /><span>{query.data?.total ?? 0} รายการ</span></div><DataTable columns={columns} data={query.data?.data ?? []} loading={query.isLoading} emptyTitle={`ยังไม่มี${isStudent ? 'ผู้เรียน' : 'วิทยากร'}`} /></section>
         <Dialog open={dialog !== null} onOpenChange={(_, data) => !data.open && setDialog(null)}><DialogSurface className="wide-dialog"><form onSubmit={(event) => { event.preventDefault(); save.mutate(); }}><DialogBody><DialogTitle>{dialog?.id ? 'แก้ไข' : 'เพิ่ม'}{isStudent ? 'ผู้เรียน' : 'วิทยากร'}</DialogTitle><DialogContent className="form-stack scroll-form"><ErrorMessage message={error} />

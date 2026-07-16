@@ -86,7 +86,7 @@ export default function CoursesPage() {
                 {(user.role === 'super_admin' || Number(row.original.created_by) === Number(user.id)) ? <>
                     <Button appearance="subtle" icon={<EditRegular />} aria-label="แก้ไขหลักสูตร" onClick={() => openEdit(row.original)} />
                     <Button appearance="subtle" icon={<DeleteRegular />} aria-label="ลบหลักสูตร" disabled={row.original.projects_count > 0 || remove.isPending} onClick={() => window.confirm(`ยืนยันลบหลักสูตร ${row.original.name}`) && remove.mutate(row.original.id)} />
-                </> : <span className="muted-text">รอเจ้าของรายการแก้ไข</span>}
+                </> : <span className="shared-course-note">ใช้จัดตั้งกลุ่มได้</span>}
             </div>
         ) },
     ], [remove.isPending, user.id, user.role]);
@@ -96,7 +96,7 @@ export default function CoursesPage() {
             <PageHeader
                 eyebrow="คลังหลักสูตร"
                 title="หลักสูตร"
-                description="สร้าง แก้ไข แนบไฟล์ Word และ PDF พร้อมส่งให้อำเภอพิจารณา"
+                description="หลักสูตรที่อนุมัติแล้วใช้ร่วมกันได้ทุกตำบล ส่วนการแก้ไขยังเป็นสิทธิ์ของหน่วยงานเจ้าของ"
                 actions={<Button appearance="primary" icon={<AddRegular />} onClick={openCreate}>เพิ่มหลักสูตร</Button>}
             />
             <SuccessMessage message={feedback} />
@@ -106,7 +106,7 @@ export default function CoursesPage() {
                     <Input contentBefore={<SearchRegular />} placeholder="ค้นหาชื่อหลักสูตร กลุ่ม หรือหน่วยงาน" value={search} onChange={(_, data) => setSearch(data.value)} />
                     <span>{courses.data?.total ?? 0} รายการ</span>
                 </div>
-                <DataTable columns={columns} data={courses.data?.data ?? []} loading={courses.isLoading} emptyTitle="ยังไม่มีหลักสูตร" emptyText="กดเพิ่มหลักสูตรเพื่อจัดทำข้อมูลและแนบเอกสาร" />
+                <DataTable columns={columns} data={courses.data?.data ?? []} loading={courses.isLoading} emptyTitle="ยังไม่มีหลักสูตรในคลัง" emptyText="เพิ่มหลักสูตรของหน่วยงาน หรือรอหลักสูตรจากตำบลในสังกัดได้รับการอนุมัติ" />
             </section>
 
             <Dialog open={dialog !== null} onOpenChange={(_, data) => !data.open && setDialog(null)}>

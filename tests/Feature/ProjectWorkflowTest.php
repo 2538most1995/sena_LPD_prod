@@ -35,6 +35,7 @@ class ProjectWorkflowTest extends TestCase
             'id_card' => '1111111111111', 'expertise' => 'งานอาชีพ',
         ]);
         $student = Student::query()->create([
+            'created_by' => $subdistrict->id,
             'prefix' => 'นาย', 'first_name' => 'ผู้เรียน', 'last_name' => 'ทดสอบ',
             'gender' => 'ชาย', 'id_card' => '2222222222222',
         ]);
