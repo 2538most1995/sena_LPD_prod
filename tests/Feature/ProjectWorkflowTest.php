@@ -103,7 +103,6 @@ class ProjectWorkflowTest extends TestCase
             'start_time' => '09:00',
             'end_time' => '16:00',
             'fiscal_year' => 2569,
-            'status' => 'รออนุมัติ',
             'lecturer_cost' => 1200,
             'material_cost' => 800,
         ];

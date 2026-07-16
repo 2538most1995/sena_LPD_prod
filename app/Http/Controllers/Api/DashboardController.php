@@ -39,7 +39,7 @@ class DashboardController extends Controller
                 'projects_pending' => (clone $projects)->where('approval_status', 'pending')->count(),
                 'projects_approved' => (clone $projects)->where('approval_status', 'approved')->count(),
             ],
-            'projects_by_status' => (clone $projects)->selectRaw('status, COUNT(*) total')->groupBy('status')->pluck('total', 'status'),
+            'projects_by_status' => (clone $projects)->selectRaw('approval_status, COUNT(*) total')->groupBy('approval_status')->pluck('total', 'approval_status'),
             'upcoming' => (clone $projects)->with('course:id,name,hours')
                 ->whereDate('end_date', '>=', today())->orderBy('start_date')->limit(5)->get(),
             'recent_courses' => (clone $courses)->with('creator:id,school_name')->latest('updated_at')->limit(5)->get(),

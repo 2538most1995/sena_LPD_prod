@@ -51,7 +51,7 @@ export default function ReportsPage() {
     const groupedProjects = useMemo(() => [
         ['approved', 'พร้อมจัดทำเอกสาร', 'กลุ่มที่อนุมัติแล้วและพร้อมสร้างเอกสารจากข้อมูลจริง'],
         ['pending', 'รอการอนุมัติ', 'ตรวจสอบข้อมูลได้ แต่ควรรอการอนุมัติก่อนใช้เอกสาร'],
-        ['revision', 'ส่งกลับแก้ไข', 'แก้ไขรายละเอียดกลุ่มแล้วส่งให้อำเภอพิจารณาอีกครั้ง'],
+        ['revision', 'รายการที่ต้องแก้ไข', 'แก้ไขรายละเอียดกลุ่มแล้วส่งให้อำเภอพิจารณาอีกครั้ง'],
     ].map(([key, title, description]) => ({ key, title, description, items: visibleProjects.filter((project) => project.approval_status === key) }))
         .filter((group) => group.items.length > 0), [visibleProjects]);
 

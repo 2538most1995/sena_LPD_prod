@@ -14,7 +14,7 @@ const emptyForm = {
     course_id: '', lecturer_id: '', title: '', objective: '', format_type: 'หลักสูตร 3-9 ชั่วโมง',
     attribute_type: '', activity_type: '', place: '', address: '', latitude: '', longitude: '',
     start_date: '', end_date: '', start_time: '09:00', end_time: '16:00', fiscal_year: currentThaiYear,
-    status: 'ฉบับร่าง', lecturer_cost: 0, material_cost: 0, board_cost: 0, food_cost: 0,
+    lecturer_cost: 0, material_cost: 0, board_cost: 0, food_cost: 0,
     snack_cost: 0, place_cost: 0, transport_cost: 0, other_cost: 0,
 };
 const costs = [
@@ -70,7 +70,7 @@ export default function ProjectsPage() {
         { header: 'ช่วงดำเนินการ', cell: ({ row }) => <div className="primary-cell"><strong>{thaiDate(row.original.start_date)}</strong><span>ถึง {thaiDate(row.original.end_date)}</span></div> },
         { header: 'ผู้เรียน', accessorKey: 'students_count', cell: ({ getValue }) => `${getValue() ?? 0} คน` },
         { header: 'งบประมาณ', accessorKey: 'total_budget', cell: ({ getValue }) => `${Number(getValue() ?? 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท` },
-        { header: 'สถานะ', cell: ({ row }) => <div className="badge-stack"><StatusBadge value={row.original.approval_status} /><StatusBadge value={row.original.status} /></div> },
+        { header: 'สถานะ', accessorKey: 'approval_status', cell: ({ getValue }) => <StatusBadge value={getValue()} /> },
         { header: '', id: 'actions', cell: ({ row }) => <div className="row-actions">
             <Button appearance="subtle" icon={<EyeRegular />} aria-label="เปิดข้อมูลกลุ่ม" onClick={() => navigate(`/projects/${row.original.id}`)} />
             {(user.role === 'super_admin' || Number(row.original.created_by) === Number(user.id)) ? <><Button appearance="subtle" icon={<EditRegular />} aria-label="แก้ไขกลุ่ม" onClick={() => openEdit(row.original)} /><Button appearance="subtle" icon={<DeleteRegular />} aria-label="ลบกลุ่ม" disabled={remove.isPending} onClick={() => window.confirm(`ยืนยันลบ ${row.original.title}`) && remove.mutate(row.original.id)} /></> : null}
@@ -99,10 +99,7 @@ export default function ProjectsPage() {
                                 </div>
                                 <Field label="ชื่อโครงการหรือกลุ่มกิจกรรม" required><Input value={form.title} onChange={(_, data) => update('title', data.value)} /></Field>
                                 <Field label="วัตถุประสงค์"><Textarea rows={3} value={form.objective} onChange={(_, data) => update('objective', data.value)} /></Field>
-                                <div className="form-grid two">
-                                    <Field label="วิทยากร" required><select className="native-select" value={form.lecturer_id} onChange={(event) => update('lecturer_id', event.target.value)}><option value="">เลือกวิทยากร</option>{refs.data?.data?.lecturers?.map((person) => <option key={person.id} value={person.id}>{person.prefix}{person.first_name} {person.last_name}</option>)}</select></Field>
-                                    <Field label="สถานะดำเนินงาน" required><select className="native-select" value={form.status} onChange={(event) => update('status', event.target.value)}>{['ฉบับร่าง', 'รออนุมัติ', 'กำลังดำเนินการ', 'เสร็จสิ้น'].map((value) => <option key={value}>{value}</option>)}</select></Field>
-                                </div>
+                                <Field label="วิทยากร" required><select className="native-select" value={form.lecturer_id} onChange={(event) => update('lecturer_id', event.target.value)}><option value="">เลือกวิทยากร</option>{refs.data?.data?.lecturers?.map((person) => <option key={person.id} value={person.id}>{person.prefix}{person.first_name} {person.last_name}</option>)}</select></Field>
                                 <div className="form-grid two"><Field label="ประเภทคุณลักษณะ"><Input value={form.attribute_type} onChange={(_, data) => update('attribute_type', data.value)} /></Field><Field label="ประเภทกิจกรรม"><Input value={form.activity_type} onChange={(_, data) => update('activity_type', data.value)} /></Field></div>
                                 <Field label="สถานที่จัด" required><Input value={form.place} onChange={(_, data) => update('place', data.value)} /></Field>
                                 <Field label="ที่อยู่สถานที่"><Textarea rows={2} value={form.address} onChange={(_, data) => update('address', data.value)} /></Field>

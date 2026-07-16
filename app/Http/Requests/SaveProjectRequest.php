@@ -31,7 +31,6 @@ class SaveProjectRequest extends FormRequest
             'start_time' => ['nullable', 'date_format:H:i'],
             'end_time' => ['nullable', 'date_format:H:i'],
             'fiscal_year' => ['required', 'integer', 'between:2500,2700'],
-            'status' => ['required', Rule::in(['ฉบับร่าง', 'รออนุมัติ', 'กำลังดำเนินการ', 'เสร็จสิ้น'])],
             'lecturer_cost' => ['nullable', 'numeric', 'min:0'],
             'material_cost' => ['nullable', 'numeric', 'min:0'],
             'board_cost' => ['nullable', 'numeric', 'min:0'],

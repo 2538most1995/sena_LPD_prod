@@ -422,7 +422,7 @@ export default function ProjectWorkspacePage() {
             {project ? (
                 <>
                     <section className="project-summary">
-                        <Card className="project-status-card"><span>สถานะกลุ่ม</span><StatusBadge value={project.approval_status} /><small>{project.status || 'ไม่ระบุสถานะดำเนินงาน'}</small></Card>
+                        <Card className="project-status-card"><span>สถานะการอนุมัติ</span><StatusBadge value={project.approval_status} /></Card>
                         <Card><span className="summary-icon"><PeopleRegular /></span><span>ผู้เรียน</span><strong>{project.students?.length ?? 0} คน</strong></Card>
                         <Card><span className="summary-icon"><CalendarRegular /></span><span>วันจัดกิจกรรม</span><strong>{thaiDate(project.start_date)}</strong></Card>
                         <Card><span className="summary-icon"><MoneyRegular /></span><span>งบประมาณ</span><strong>{Number(project.total_budget || 0).toLocaleString('th-TH', { minimumFractionDigits: 2 })} บาท</strong></Card>

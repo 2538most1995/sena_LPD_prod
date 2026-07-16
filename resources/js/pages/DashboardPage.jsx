@@ -75,7 +75,7 @@ export default function DashboardPage() {
                         {(data?.upcoming ?? []).map((project) => (
                             <button key={project.id} onClick={() => navigate(`/projects?project=${project.id}`)}>
                                 <span><strong>{project.title}</strong><small>{thaiDate(project.start_date)} · {project.place}</small></span>
-                                <StatusBadge value={project.status} />
+                                <StatusBadge value={project.approval_status} />
                             </button>
                         ))}
                         {!data?.upcoming?.length ? <div className="empty-inline">ยังไม่มีกิจกรรมที่กำลังมาถึง</div> : null}
