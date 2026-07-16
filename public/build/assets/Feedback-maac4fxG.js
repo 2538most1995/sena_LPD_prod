@@ -1,1 +1,0 @@
-import{B as e,D as t,H as n,O as r}from"./api-BuhEwOSK.js";n();var i=e();function a({message:e}){return e?(0,i.jsx)(t,{intent:`error`,children:(0,i.jsx)(r,{children:e})}):null}function o({message:e}){return e?(0,i.jsx)(t,{intent:`success`,children:(0,i.jsx)(r,{children:e})}):null}export{o as n,a as t};
