@@ -241,7 +241,20 @@ button { -webkit-tap-highlight-color: transparent; }
 .native-file { padding: 7px 9px; }
 .file-pair { display: grid; padding: 18px; grid-template-columns: 1fr 1fr; gap: 16px; border: 1px dashed color-mix(in srgb, var(--accent) 45%, var(--line)); border-radius: var(--radius-md); background: var(--accent-softer); }
 .form-note { margin: -5px 0 0; color: var(--muted); font-size: 11px; }
-.import-dialog-intro { margin: 0; padding: 13px 15px; border-left: 3px solid var(--highlight); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; color: var(--muted); background: var(--highlight-soft); font-size: 13px; line-height: 1.65; }
+.import-dialog-intro { margin: 0; padding: 15px 17px; border-left: 4px solid var(--highlight); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; color: var(--text); background: var(--highlight-soft); font-size: 13px; line-height: 1.65; }
+.import-dialog-intro > strong { display: block; margin-bottom: 5px; color: var(--ink); font-size: 15px; }
+.import-dialog-intro ol { margin: 0 0 5px; padding-left: 22px; }
+.import-dialog-intro li { padding: 2px 0; }
+.import-dialog-intro > span { color: var(--muted); }
+.import-file-picker { display: flex; min-height: 92px; padding: 16px 18px; align-items: center; justify-content: center; gap: 13px; border: 2px dashed var(--line-strong); border-radius: var(--radius-md); color: var(--accent); background: var(--surface-2); cursor: pointer; text-align: left; transition: border-color .18s ease, background .18s ease, transform .18s ease; }
+.import-file-picker:hover { border-color: var(--accent); background: var(--accent-softer); transform: translateY(-1px); }
+.import-file-picker.has-file { border-style: solid; border-color: #247453; background: color-mix(in srgb, #247453 9%, var(--surface)); color: #247453; }
+.import-file-picker input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+.import-file-picker > svg { width: 30px; height: 30px; flex: 0 0 auto; }
+.import-file-picker span { display: grid; gap: 2px; }
+.import-file-picker strong { overflow-wrap: anywhere; color: var(--ink); font-size: 14px; }
+.import-file-picker small { color: var(--muted); font-size: 12px; }
+.multiline-message { white-space: pre-line; line-height: 1.55; }
 .cost-box { padding: 18px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface-2); }
 .cost-box legend { padding: 0 8px; color: var(--muted); font-size: 12px; font-weight: 700; }
 .form-submit { display: flex; justify-content: flex-end; }

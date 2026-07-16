@@ -118,7 +118,19 @@ class StudentImportController extends Controller
                 'address' => ['nullable', 'string', 'max:2000'],
                 'phone' => ['nullable', 'string', 'max:30'],
                 'registered_at' => ['nullable', 'date_format:Y-m-d'],
-            ], [], [
+            ], [
+                'required' => 'กรุณากรอก :attribute',
+                'in' => ':attribute ต้องเลือกจากรายการที่กำหนดในเทมเพลต',
+                'string' => ':attribute ต้องเป็นข้อความ',
+                'max' => ':attribute มีความยาวหรือค่ามากเกินกำหนด',
+                'id_card.unique' => 'เลขประจำตัวประชาชนนี้มีอยู่ในระบบแล้ว',
+                'birthday.date_format' => 'วันเกิดไม่ถูกต้อง ตัวอย่าง 21/08/2538 หรือ 1995-08-21',
+                'birthday.before' => 'วันเกิดต้องเป็นวันที่ก่อนวันนี้',
+                'registered_at.date_format' => 'วันที่ขึ้นทะเบียนไม่ถูกต้อง ตัวอย่าง 16/07/2569 หรือ 2026-07-16',
+                'annual_income.numeric' => 'รายได้ต่อปีต้องเป็นตัวเลข',
+                'annual_income.min' => 'รายได้ต่อปีต้องไม่น้อยกว่า 0',
+                'annual_income.max' => 'รายได้ต่อปีมีค่ามากเกินกำหนด',
+            ], [
                 'prefix' => 'คำนำหน้า', 'first_name' => 'ชื่อ', 'last_name' => 'นามสกุล',
                 'gender' => 'เพศ', 'id_card' => 'เลขประจำตัวประชาชน', 'birthday' => 'วันเกิด',
                 'education' => 'การศึกษา', 'career' => 'อาชีพ', 'target_group' => 'กลุ่มเป้าหมาย',
@@ -140,9 +152,9 @@ class StudentImportController extends Controller
         }
 
         if ($errors !== []) {
-            $message = implode(' | ', array_slice($errors, 0, 12));
+            $message = "พบข้อมูลที่ต้องแก้ไข:\n• ".implode("\n• ", array_slice($errors, 0, 12));
             if (count($errors) > 12) {
-                $message .= ' | และข้อผิดพลาดอีก '.(count($errors) - 12).' รายการ';
+                $message .= "\n• และข้อผิดพลาดอีก ".(count($errors) - 12).' รายการ';
             }
 
             return response()->json(['message' => $message], 422);
@@ -183,22 +195,33 @@ class StudentImportController extends Controller
         if ($value === null || $value === '') {
             return null;
         }
-        if (is_numeric($value) && ExcelDate::isDateTime($cell)) {
+        if (is_numeric($value) && (float) $value >= 5000 && (float) $value <= 100000) {
             return ExcelDate::excelToDateTimeObject((float) $value)->format('Y-m-d');
         }
 
-        $text = trim((string) $cell->getFormattedValue());
-        foreach (['Y-m-d', 'd/m/Y', 'd-m-Y'] as $format) {
-            try {
-                $date = CarbonImmutable::createFromFormat('!'.$format, $text);
-                if ($date && $date->format($format) === $text) {
-                    return $date->format('Y-m-d');
-                }
-            } catch (Throwable) {
-                // Try the next supported format.
-            }
+        $text = strtr(trim((string) $cell->getFormattedValue()), [
+            '๐' => '0', '๑' => '1', '๒' => '2', '๓' => '3', '๔' => '4',
+            '๕' => '5', '๖' => '6', '๗' => '7', '๘' => '8', '๙' => '9',
+        ]);
+        if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $text, $matches)) {
+            return $this->normalizedDate((int) $matches[1], (int) $matches[2], (int) $matches[3]) ?? $text;
+        }
+        if (preg_match('/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/', $text, $matches)) {
+            return $this->normalizedDate((int) $matches[3], (int) $matches[2], (int) $matches[1]) ?? $text;
         }
 
         return $text;
+    }
+
+    private function normalizedDate(int $year, int $month, int $day): ?string
+    {
+        if ($year >= 2400) {
+            $year -= 543;
+        }
+        if (! checkdate($month, $day, $year)) {
+            return null;
+        }
+
+        return CarbonImmutable::create($year, $month, $day)->format('Y-m-d');
     }
 }

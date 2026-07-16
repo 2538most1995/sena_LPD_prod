@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Tests\TestCase;
@@ -27,8 +29,8 @@ class StudentExcelImportTest extends TestCase
     {
         $user = $this->user();
         $file = $this->excelFile([
-            ['นาย', 'สมชาย', 'ใจดี', 'ชาย', '1000000000001', '1990-04-12', 'มัธยมศึกษา', 'ค้าขาย', 'ประชาชนทั่วไป', 150000, 'อำเภอเสนา', '0810000001', '2026-07-16'],
-            ['นางสาว', 'สมหญิง', 'เรียนรู้', 'หญิง', '1000000000002', '1995-08-21', 'ปริญญาตรี', 'รับจ้าง', 'ประชาชนทั่วไป', 180000, 'อำเภอเสนา', '0810000002', '2026-07-16'],
+            ['นาย', 'สมชาย', 'ใจดี', 'ชาย', '1000000000001', ExcelDate::PHPToExcel(new \DateTimeImmutable('1990-04-12')), 'มัธยมศึกษา', 'ค้าขาย', 'ประชาชนทั่วไป', 150000, 'อำเภอเสนา', '0810000001', ExcelDate::PHPToExcel(new \DateTimeImmutable('2026-07-16'))],
+            ['นางสาว', 'สมหญิง', 'เรียนรู้', 'หญิง', '1000000000002', '21/08/2538', 'ปริญญาตรี', 'รับจ้าง', 'ประชาชนทั่วไป', 180000, 'อำเภอเสนา', '0810000002', '16/07/2569'],
         ]);
 
         $this->actingAs($user)->post('/api/v1/students/import', ['file' => $file], ['Accept' => 'application/json'])
@@ -41,6 +43,12 @@ class StudentExcelImportTest extends TestCase
             'id_card' => '1000000000001',
             'first_name' => 'สมชาย',
         ]);
+        $firstStudent = Student::query()->where('id_card', '1000000000001')->firstOrFail();
+        $secondStudent = Student::query()->where('id_card', '1000000000002')->firstOrFail();
+        $this->assertSame('1990-04-12', $firstStudent->birthday->toDateString());
+        $this->assertSame('2026-07-16', $firstStudent->registered_at->toDateString());
+        $this->assertSame('1995-08-21', $secondStudent->birthday->toDateString());
+        $this->assertSame('2026-07-16', $secondStudent->registered_at->toDateString());
         $this->assertDatabaseHas('audit_logs', ['action' => 'student.imported']);
     }
 
@@ -52,10 +60,11 @@ class StudentExcelImportTest extends TestCase
             ['ผิด', '', 'ทดสอบ', 'ไม่ถูกต้อง', '2000000000002', null, null, null, null, 0, null, null, null],
         ]);
 
-        $this->actingAs($user)->post('/api/v1/students/import', ['file' => $file], ['Accept' => 'application/json'])
+        $response = $this->actingAs($user)->post('/api/v1/students/import', ['file' => $file], ['Accept' => 'application/json'])
             ->assertUnprocessable()
             ->assertJsonPath('message', fn (string $message): bool => str_contains($message, 'แถว 3'));
 
+        $this->assertStringNotContainsString('validation.', $response->json('message'));
         $this->assertDatabaseCount('students', 0);
     }
 
