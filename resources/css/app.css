@@ -367,10 +367,8 @@ button { -webkit-tap-highlight-color: transparent; }
 .report-project-meta > div:last-child { grid-column: 1 / -1; }
 .report-project-meta dt { color: var(--muted); font-size: 11px; }
 .report-project-meta dd { margin: 3px 0 0; color: var(--ink); font-size: 13px; line-height: 1.5; }
-.report-project-actions { display: flex; margin-top: auto; padding-top: 13px; align-items: center; gap: 3px; border-top: 1px solid var(--line); }
-.report-project-actions > .MuiButton-root:first-child { margin-right: auto; }
-.report-project-actions > .MuiIconButton-root { width: 40px; height: 40px; color: var(--muted); }
-.report-project-actions > .MuiIconButton-root:hover { color: var(--accent); background: var(--accent-softer); }
+.report-project-actions { display: flex; margin-top: auto; padding-top: 13px; align-items: center; border-top: 1px solid var(--line); }
+.report-project-actions > .MuiButton-root { width: 100%; }
 .report-workspace-summary { display: grid; margin-bottom: 20px; grid-template-columns: 1.7fr repeat(3, minmax(150px, .65fr)); gap: 12px; }
 .report-workspace-summary > div { display: grid; min-height: 112px; padding: 17px; align-content: center; gap: 4px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); box-shadow: var(--shadow-sm); }
 .report-workspace-summary > div:not(.report-workspace-copy) { grid-template-columns: auto 1fr; align-items: center; gap: 5px 10px; }

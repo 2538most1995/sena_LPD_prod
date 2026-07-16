@@ -1,0 +1,1 @@
+import{O as e,U as t,V as n,k as r}from"./api-KUhIv0LF.js";t();var i=n();function a({message:t}){return t?(0,i.jsx)(e,{intent:`error`,children:(0,i.jsx)(r,{children:t})}):null}function o({message:t}){return t?(0,i.jsx)(e,{intent:`success`,children:(0,i.jsx)(r,{children:t})}):null}export{o as n,a as t};

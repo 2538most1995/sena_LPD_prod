@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, Field, Input, Textarea } from '../ui';
 import { AddRegular, DeleteRegular, EditRegular, EyeRegular, SearchRegular } from '../ui/icons';
-import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { apiRequest, firstError, queryString } from '../api';
 import DataTable from '../components/DataTable';
 import PageHeader from '../components/PageHeader';
@@ -26,7 +26,6 @@ const thaiDate = (value) => value ? new Intl.DateTimeFormat('th-TH', { dateStyle
 export default function ProjectsPage() {
     const { user, apiBase } = useOutletContext();
     const navigate = useNavigate();
-    const location = useLocation();
     const queryClient = useQueryClient();
     const [search, setSearch] = useState('');
     const [dialog, setDialog] = useState(null);
@@ -63,11 +62,6 @@ export default function ProjectsPage() {
         next.end_time = project.end_time?.slice(0, 5) ?? '16:00';
         setForm(next); setDialog(project); setError('');
     };
-    useEffect(() => {
-        if (location.state?.createProject) openCreate();
-        if (location.state?.editProject) openEdit(location.state.editProject);
-        if (location.state?.createProject || location.state?.editProject) navigate('/projects', { replace: true, state: null });
-    }, [location.state]);
     const update = (name, value) => setForm((current) => ({ ...current, [name]: value }));
     const selectedCourse = refs.data?.data?.courses?.find((item) => String(item.id) === String(form.course_id));
 

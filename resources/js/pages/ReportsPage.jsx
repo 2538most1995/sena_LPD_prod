@@ -1,15 +1,15 @@
 import React, { useMemo, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Button, Card, Input } from '../ui';
 import {
-    AddRegular, ArrowLeftRegular, CalendarRegular, DeleteRegular, DocumentBulletListRegular,
-    DocumentPdfRegular, EditRegular, EyeRegular, OpenRegular, PeopleRegular, SearchRegular,
+    ArrowLeftRegular, CalendarRegular, DocumentBulletListRegular,
+    DocumentPdfRegular, OpenRegular, PeopleRegular, SearchRegular,
 } from '../ui/icons';
 import { useNavigate, useOutletContext, useSearchParams } from 'react-router-dom';
-import { apiRequest, firstError } from '../api';
+import { apiRequest } from '../api';
 import PageHeader from '../components/PageHeader';
 import StatusBadge from '../components/StatusBadge';
-import { ErrorMessage, SuccessMessage } from '../components/Feedback';
+import { ErrorMessage } from '../components/Feedback';
 
 const ptReports = [
     'พต.1 แบบสำรวจความต้องการ', 'พต.2 ใบสมัครผู้เรียน', 'พต.3 หลักสูตรฝึกอบรม', 'พต.4 หนังสือเชิญวิทยากร',
@@ -33,29 +33,14 @@ const specialReports = [
 const thaiDate = (value) => value ? new Intl.DateTimeFormat('th-TH', { dateStyle: 'medium' }).format(new Date(value)) : 'ไม่ระบุ';
 
 export default function ReportsPage() {
-    const { user, apiBase } = useOutletContext();
+    const { apiBase } = useOutletContext();
     const navigate = useNavigate();
-    const queryClient = useQueryClient();
     const [searchParams] = useSearchParams();
     const [search, setSearch] = useState('');
     const [status, setStatus] = useState('all');
-    const [feedback, setFeedback] = useState('');
-    const [error, setError] = useState('');
     const projectId = searchParams.get('project') || '';
     const projects = useQuery({ queryKey: ['projects', 'report-list'], queryFn: () => apiRequest(`${apiBase}/projects?per_page=100`) });
     const selectedProject = projects.data?.data?.find((project) => String(project.id) === String(projectId));
-    const canManage = (project) => user.role === 'super_admin' || Number(project.created_by) === Number(user.id);
-
-    const remove = useMutation({
-        mutationFn: (id) => apiRequest(`${apiBase}/projects/${id}`, { method: 'DELETE' }),
-        onSuccess: (result) => {
-            queryClient.invalidateQueries({ queryKey: ['projects'] });
-            setFeedback(result.message);
-            setError('');
-        },
-        onError: (requestError) => setError(firstError(requestError)),
-    });
-
     const visibleProjects = useMemo(() => {
         const term = search.trim().toLocaleLowerCase('th-TH');
         return (projects.data?.data ?? []).filter((project) => {
@@ -80,8 +65,6 @@ export default function ReportsPage() {
     };
 
     const openDocuments = (project) => {
-        setFeedback('');
-        setError('');
         navigate(`/reports?project=${encodeURIComponent(project.id)}`);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -118,9 +101,8 @@ export default function ReportsPage() {
 
     return (
         <>
-            <PageHeader eyebrow="ศูนย์เอกสารทางราชการ" title="จัดการเอกสารแยกตามกลุ่ม" description="เลือกกลุ่มกิจกรรมก่อน จึงจะแสดงแบบฟอร์มและรายงาน PDF ที่สัมพันธ์กับข้อมูลของกลุ่มนั้น" actions={<Button appearance="primary" icon={<AddRegular />} onClick={() => navigate('/projects', { state: { createProject: true } })}>สร้างกลุ่มใหม่</Button>} />
-            <SuccessMessage message={feedback} />
-            <ErrorMessage message={error || projects.error?.message} />
+            <PageHeader eyebrow="ศูนย์เอกสารทางราชการ" title="จัดการเอกสารแยกตามกลุ่ม" description="เลือกกลุ่มกิจกรรมก่อน จึงจะแสดงแบบฟอร์มและรายงาน PDF ที่สัมพันธ์กับข้อมูลของกลุ่มนั้น" />
+            <ErrorMessage message={projects.error?.message} />
             <section className="report-manager-toolbar content-card">
                 <div><Input contentBefore={<SearchRegular />} placeholder="ค้นหาชื่อกลุ่ม หลักสูตร หรือสถานที่" value={search} onChange={(_, data) => setSearch(data.value)} /></div>
                 <div className="report-status-filter">
@@ -139,8 +121,6 @@ export default function ReportsPage() {
                             <dl className="report-project-meta"><div><dt>ช่วงดำเนินการ</dt><dd>{thaiDate(project.start_date)} ถึง {thaiDate(project.end_date)}</dd></div><div><dt>ผู้เรียน</dt><dd>{project.students_count ?? 0} คน</dd></div><div><dt>สถานที่</dt><dd>{project.place || 'ไม่ระบุ'}</dd></div></dl>
                             <div className="report-project-actions">
                                 <Button appearance="primary" icon={<DocumentPdfRegular />} onClick={() => openDocuments(project)}>จัดการเอกสาร</Button>
-                                <Button appearance="subtle" icon={<EyeRegular />} aria-label="ดูข้อมูลกลุ่ม" onClick={() => navigate(`/projects/${project.id}`)} />
-                                {canManage(project) ? <><Button appearance="subtle" icon={<EditRegular />} aria-label="แก้ไขกลุ่ม" onClick={() => navigate('/projects', { state: { editProject: project } })} /><Button appearance="subtle" icon={<DeleteRegular />} aria-label="ลบกลุ่ม" disabled={remove.isPending} onClick={() => window.confirm(`ยืนยันลบ ${project.title}`) && remove.mutate(project.id)} /></> : null}
                             </div>
                         </Card>
                     ))}</div>

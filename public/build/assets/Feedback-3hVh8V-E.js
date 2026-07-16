@@ -1,1 +1,0 @@
-import{A as e,H as t,W as n,k as r}from"./api-Bpj9ZGGP.js";n();var i=t();function a({message:t}){return t?(0,i.jsx)(r,{intent:`error`,children:(0,i.jsx)(e,{children:t})}):null}function o({message:t}){return t?(0,i.jsx)(r,{intent:`success`,children:(0,i.jsx)(e,{children:t})}):null}export{o as n,a as t};
