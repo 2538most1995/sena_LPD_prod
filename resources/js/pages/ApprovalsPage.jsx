@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Card, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, Field, Tab, TabList, Textarea } from '../ui';
-import { CheckmarkCircleRegular, DocumentPdfRegular, DocumentWordRegular, DismissCircleRegular } from '../ui/icons';
+import { BookRegular, BuildingRegular, CheckmarkCircleRegular, ClipboardTaskListLtrRegular, DocumentPdfRegular, DocumentWordRegular, DismissCircleRegular, HistoryRegular } from '../ui/icons';
 import { useOutletContext } from 'react-router-dom';
 import { apiRequest, firstError } from '../api';
 import PageHeader from '../components/PageHeader';
@@ -13,7 +13,7 @@ const thaiDateTime = (value) => value ? new Intl.DateTimeFormat('th-TH', { dateS
 function RequestCard({ type, item, apiBase, onReview, history = false }) {
     const isCourse = type === 'course';
     return <Card className="approval-card">
-        <div className="approval-card-top"><div><span>{isCourse ? 'คำขอหลักสูตร' : 'คำขอจัดตั้งกลุ่ม'}</span><h3>{isCourse ? item.name : item.title}</h3></div><StatusBadge value={item.approval_status} /></div>
+        <div className="approval-card-top"><div><span className="approval-request-kind">{isCourse ? 'คำขอหลักสูตร' : 'คำขอจัดตั้งกลุ่ม'}</span><h3>{isCourse ? item.name : item.title}</h3></div><StatusBadge value={item.approval_status} /></div>
         <dl className="detail-grid">
             <div><dt>หน่วยงาน</dt><dd>{item.creator?.school_name || item.owner}</dd></div>
             <div><dt>{isCourse ? 'จำนวนชั่วโมง' : 'หลักสูตร'}</dt><dd>{isCourse ? `${item.hours} ชั่วโมง` : item.course?.name}</dd></div>
@@ -27,7 +27,7 @@ function RequestCard({ type, item, apiBase, onReview, history = false }) {
 }
 
 export default function ApprovalsPage() {
-    const { apiBase } = useOutletContext();
+    const { user, apiBase } = useOutletContext();
     const queryClient = useQueryClient();
     const [tab, setTab] = useState('pending');
     const [review, setReview] = useState(null);
@@ -45,14 +45,20 @@ export default function ApprovalsPage() {
     const pendingCount = (data?.pending?.courses?.length ?? 0) + (data?.pending?.projects?.length ?? 0);
     const historyCount = (data?.history?.courses?.length ?? 0) + (data?.history?.projects?.length ?? 0);
     const list = tab === 'pending' ? data?.pending : data?.history;
+    const isSuperAdmin = user?.role === 'super_admin';
+    const EmptyState = ({ type }) => {
+        const isCourse = type === 'course';
+        const Icon = isCourse ? BookRegular : BuildingRegular;
+        return <div className="approval-empty"><span><Icon /></span><strong>{isCourse ? 'ไม่มีคำขอหลักสูตร' : 'ไม่มีคำขอจัดตั้งกลุ่ม'}</strong><p>{tab === 'pending' ? 'ยังไม่มีรายการจากตำบลที่รอการพิจารณา' : 'ยังไม่มีประวัติการพิจารณาในหมวดนี้'}</p></div>;
+    };
 
     return <>
-        <PageHeader eyebrow="สำหรับ Admin ระดับอำเภอ" title="อนุมัติระดับอำเภอ" description="ตรวจหลักสูตร เอกสารแนบ และคำขอจัดตั้งกลุ่มจากตำบลในสังกัด" />
+        <PageHeader eyebrow={isSuperAdmin ? 'ภาพรวมทุกอำเภอ' : 'สำหรับ Admin ระดับอำเภอ'} title="อนุมัติระดับอำเภอ" description={isSuperAdmin ? 'ติดตามผลการพิจารณาหลักสูตรและคำขอจัดตั้งกลุ่มจากทุกพื้นที่' : 'ตรวจหลักสูตร เอกสารแนบ และคำขอจัดตั้งกลุ่มจากตำบลในสังกัด'} />
         <SuccessMessage message={feedback} /><ErrorMessage message={error || query.error?.message} />
-        <section className="approval-summary"><div><strong>{pendingCount}</strong><span>รายการรอพิจารณา</span></div><div><strong>{historyCount}</strong><span>ประวัติการพิจารณา</span></div></section>
-        <TabList selectedValue={tab} onTabSelect={(_, dataTab) => setTab(dataTab.value)}><Tab value="pending">รอพิจารณา ({pendingCount})</Tab><Tab value="history">ประวัติอนุมัติ ({historyCount})</Tab></TabList>
-        <section className="approval-section"><div className="section-heading"><h2>หลักสูตร</h2><span>{list?.courses?.length ?? 0} รายการ</span></div><div className="approval-grid">{list?.courses?.map((item) => <RequestCard key={item.id} type="course" item={item} apiBase={apiBase} history={tab === 'history'} onReview={openReview} />)}{!list?.courses?.length ? <div className="state-panel empty-state"><strong>ไม่มีคำขอหลักสูตรในรายการนี้</strong></div> : null}</div></section>
-        <section className="approval-section"><div className="section-heading"><h2>จัดตั้งกลุ่ม</h2><span>{list?.projects?.length ?? 0} รายการ</span></div><div className="approval-grid">{list?.projects?.map((item) => <RequestCard key={item.id} type="project" item={item} apiBase={apiBase} history={tab === 'history'} onReview={openReview} />)}{!list?.projects?.length ? <div className="state-panel empty-state"><strong>ไม่มีคำขอจัดตั้งกลุ่มในรายการนี้</strong></div> : null}</div></section>
+        <section className="approval-summary"><div><span className="approval-summary-icon"><ClipboardTaskListLtrRegular /></span><span><small>รายการที่ต้องดำเนินการ</small><strong>{pendingCount}</strong><em>รอพิจารณา</em></span></div><div><span className="approval-summary-icon"><HistoryRegular /></span><span><small>รายการที่ดำเนินการแล้ว</small><strong>{historyCount}</strong><em>ประวัติการพิจารณา</em></span></div></section>
+        <TabList selectedValue={tab} onTabSelect={(_, dataTab) => setTab(dataTab.value)}><Tab value="pending">รอพิจารณา ({pendingCount})</Tab><Tab value="history">ประวัติการพิจารณา ({historyCount})</Tab></TabList>
+        <section className="approval-section"><div className="section-heading"><h2>หลักสูตร</h2><span>{list?.courses?.length ?? 0} รายการ</span></div><div className="approval-grid">{list?.courses?.map((item) => <RequestCard key={item.id} type="course" item={item} apiBase={apiBase} history={tab === 'history'} onReview={openReview} />)}{!query.isLoading && !list?.courses?.length ? <EmptyState type="course" /> : null}</div></section>
+        <section className="approval-section"><div className="section-heading"><h2>จัดตั้งกลุ่ม</h2><span>{list?.projects?.length ?? 0} รายการ</span></div><div className="approval-grid">{list?.projects?.map((item) => <RequestCard key={item.id} type="project" item={item} apiBase={apiBase} history={tab === 'history'} onReview={openReview} />)}{!query.isLoading && !list?.projects?.length ? <EmptyState type="project" /> : null}</div></section>
         <Dialog open={review !== null} onOpenChange={(_, dataDialog) => !dataDialog.open && setReview(null)}><DialogSurface><form onSubmit={(event) => { event.preventDefault(); mutation.mutate(); }}><DialogBody><DialogTitle>{review?.status === 'approved' ? 'ยืนยันการอนุมัติ' : 'ส่งกลับให้แก้ไข'}</DialogTitle><DialogContent className="form-stack"><p>{review?.status === 'approved' ? `อนุมัติรายการ “${review?.item?.name || review?.item?.title}”` : 'ระบุรายละเอียดที่ต้องแก้ไขเพื่อให้ตำบลดำเนินการได้ถูกต้อง'}</p><ErrorMessage message={error} /><Field label="หมายเหตุ" required={review?.status === 'revision'}><Textarea rows={4} value={note} onChange={(_, dataNote) => setNote(dataNote.value)} /></Field></DialogContent><DialogActions><Button type="button" onClick={() => setReview(null)}>ยกเลิก</Button><Button type="submit" appearance="primary" disabled={mutation.isPending || (review?.status === 'revision' && !note.trim())}>{mutation.isPending ? 'กำลังบันทึก' : review?.status === 'approved' ? 'ยืนยันอนุมัติ' : 'ส่งกลับแก้ไข'}</Button></DialogActions></DialogBody></form></DialogSurface></Dialog>
     </>;
 }

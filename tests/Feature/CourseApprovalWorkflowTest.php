@@ -63,6 +63,43 @@ class CourseApprovalWorkflowTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_active_district_can_review_items_linked_to_its_legacy_account(): void
+    {
+        $district = $this->user('DISTRICT-ACTIVE', 'district_admin');
+        $district->update(['school_name' => 'สกร.ระดับอำเภอเสนา']);
+
+        $legacyDistrict = $this->user('DISTRICT-LEGACY', 'district_admin');
+        $legacyDistrict->update([
+            'school_name' => $district->school_name,
+            'status' => 'inactive',
+        ]);
+
+        $subdistrict = $this->user('SUBDISTRICT-LEGACY', 'subdistrict_admin', $legacyDistrict->id);
+        $course = Course::query()->create([
+            'created_by' => $subdistrict->id,
+            'name' => 'หลักสูตรจากโครงสร้างบัญชีเดิม',
+            'category' => 'การเรียนการสอน',
+            'hours' => 5,
+            'owner' => $subdistrict->school_name,
+            'description' => 'ใช้ตรวจสอบการเชื่อมบัญชีอำเภอเดิม',
+            'approval_status' => 'pending',
+        ]);
+
+        $this->actingAs($district)->getJson('/api/v1/approvals')
+            ->assertOk()
+            ->assertJsonPath('data.pending.courses.0.id', $course->id);
+
+        $this->actingAs($district)->postJson("/api/v1/courses/{$course->id}/review", [
+            'status' => 'approved',
+        ])->assertOk();
+
+        $this->assertDatabaseHas('courses', [
+            'id' => $course->id,
+            'approval_status' => 'approved',
+            'reviewed_by' => $district->id,
+        ]);
+    }
+
     public function test_course_can_be_updated_with_multipart_method_spoofing(): void
     {
         $district = $this->user('DISTRICT01', 'district_admin');

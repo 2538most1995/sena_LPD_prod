@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\LearningProject;
 use App\Models\User;
+use App\Services\AccessScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ApprovalController extends Controller
 {
+    public function __construct(private readonly AccessScope $scope) {}
+
     public function __invoke(Request $request): JsonResponse
     {
         /** @var User $user */
@@ -53,15 +56,11 @@ class ApprovalController extends Controller
 
     private function courseScope(Builder $query, User $user): Builder
     {
-        return $user->role === 'super_admin'
-            ? $query->whereHas('creator', fn (Builder $owner) => $owner->where('role', 'subdistrict_admin'))
-            : $query->whereHas('creator', fn (Builder $owner) => $owner->where('parent_id', $user->id));
+        return $query->whereIn('created_by', $this->scope->reviewableOwnerIds($user));
     }
 
     private function projectScope(Builder $query, User $user): Builder
     {
-        return $user->role === 'super_admin'
-            ? $query->whereHas('creator', fn (Builder $owner) => $owner->where('role', 'subdistrict_admin'))
-            : $query->whereHas('creator', fn (Builder $owner) => $owner->where('parent_id', $user->id));
+        return $query->whereIn('created_by', $this->scope->reviewableOwnerIds($user));
     }
 }

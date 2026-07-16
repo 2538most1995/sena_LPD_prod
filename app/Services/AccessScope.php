@@ -17,7 +17,10 @@ class AccessScope
         }
 
         if ($user->role === 'district_admin') {
-            return $user->children()->pluck('id')->push($user->id)->unique()->values();
+            return $this->reviewableOwnerIds($user)
+                ->merge($this->districtAliasIds($user))
+                ->unique()
+                ->values();
         }
 
         return collect([$user->id]);
@@ -63,7 +66,49 @@ class AccessScope
 
         return $reviewer->role === 'district_admin'
             && $owner->role === 'subdistrict_admin'
-            && (int) $owner->parent_id === (int) $reviewer->id;
+            && $this->reviewableOwnerIds($reviewer)->contains((int) $owner->id);
+    }
+
+    public function reviewableOwnerIds(User $reviewer): Collection
+    {
+        if ($reviewer->role === 'super_admin') {
+            return User::query()
+                ->where('role', 'subdistrict_admin')
+                ->pluck('id');
+        }
+
+        if ($reviewer->role !== 'district_admin') {
+            return collect();
+        }
+
+        return User::query()
+            ->where('role', 'subdistrict_admin')
+            ->whereIn('parent_id', $this->districtAliasIds($reviewer))
+            ->pluck('id');
+    }
+
+    private function districtAliasIds(User $district): Collection
+    {
+        $configuredSchoolIds = collect([
+            config('sena.district_school_id'),
+            config('sena.legacy_district_school_id'),
+        ])->filter()->map(fn ($id): string => (string) $id);
+
+        return User::query()
+            ->where('role', 'district_admin')
+            ->where(function (Builder $query) use ($district, $configuredSchoolIds): void {
+                $query->where('id', $district->id)
+                    ->orWhere('school_name', $district->school_name);
+
+                if ($configuredSchoolIds->contains((string) $district->school_id)) {
+                    $query->orWhereIn('school_id', $configuredSchoolIds);
+                }
+            })
+            ->pluck('id')
+            ->push($district->id)
+            ->map(fn ($id): int => (int) $id)
+            ->unique()
+            ->values();
     }
 
     public function canEditOwned(User $user, int|string|null $ownerId): bool
