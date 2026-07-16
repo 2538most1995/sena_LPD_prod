@@ -9,6 +9,7 @@ use App\Services\LegacyStorage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Throwable;
 
 class ProfileController extends Controller
 {
@@ -42,14 +43,32 @@ class ProfileController extends Controller
             $data['password_hash'] = Hash::make($data['password']);
         }
         unset($data['password']);
+        $oldPhotoPath = $user->photo_path;
+        $newPhotoPath = null;
         if ($request->hasFile('photo')) {
-            $this->storage->delete($user->photo_path);
-            $data['photo_path'] = $this->storage->store($request->file('photo'), 'profiles');
+            $newPhotoPath = $this->storage->store($request->file('photo'), 'profiles');
+            $data['photo_path'] = $newPhotoPath;
         }
-        $user->update($data);
-        $this->audit->record('profile.updated', $user, $before, $user->fresh()->toArray());
 
-        return response()->json(['message' => 'บันทึกโปรไฟล์เรียบร้อย', 'data' => $user->fresh()]);
+        try {
+            $user->update($data);
+            $this->audit->record('profile.updated', $user, $before, $user->fresh()->toArray());
+        } catch (Throwable $exception) {
+            $this->storage->delete($newPhotoPath);
+            throw $exception;
+        }
+
+        if ($newPhotoPath && $oldPhotoPath !== $newPhotoPath) {
+            $this->storage->delete($oldPhotoPath);
+        }
+
+        $freshUser = $user->fresh();
+        $responseData = $freshUser->toArray();
+        $responseData['photo_url'] = $freshUser->photo_path
+            ? route('api.profile.photo').'?v='.rawurlencode((string) $freshUser->updated_at?->timestamp)
+            : null;
+
+        return response()->json(['message' => 'บันทึกโปรไฟล์เรียบร้อย', 'data' => $responseData]);
     }
 
     public function photo(Request $request): mixed
@@ -59,6 +78,12 @@ class ProfileController extends Controller
         $absolute = $user->photo_path ? $this->storage->absolute($user->photo_path) : null;
         abort_unless($absolute, 404);
 
-        return response()->file($absolute, ['X-Content-Type-Options' => 'nosniff']);
+        $response = response()->file($absolute);
+        $response->setPrivate();
+        $response->setMaxAge(0);
+        $response->headers->addCacheControlDirective('no-store');
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+
+        return $response;
     }
 }

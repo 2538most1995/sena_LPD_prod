@@ -4,6 +4,7 @@ export { default as ArrowLeftRegular } from '@mui/icons-material/ArrowBackRounde
 export { default as ArrowRightRegular } from '@mui/icons-material/ArrowForwardRounded';
 export { default as ArrowSyncRegular } from '@mui/icons-material/RefreshRounded';
 export { default as BookRegular } from '@mui/icons-material/AutoStoriesRounded';
+export { default as BuildingRegular } from '@mui/icons-material/BusinessOutlined';
 export { default as BuildingGovernmentRegular } from '@mui/icons-material/AccountBalanceRounded';
 export { default as CalendarRegular } from '@mui/icons-material/CalendarMonthOutlined';
 export { default as CameraRegular } from '@mui/icons-material/PhotoCameraOutlined';
@@ -24,11 +25,13 @@ export { default as HatGraduationRegular } from '@mui/icons-material/SchoolOutli
 export { default as HistoryRegular } from '@mui/icons-material/HistoryRounded';
 export { default as HomeRegular } from '@mui/icons-material/GridViewRounded';
 export { default as LockClosedRegular } from '@mui/icons-material/LockOutlined';
+export { default as LocationRegular } from '@mui/icons-material/PlaceOutlined';
 export { default as NavigationRegular } from '@mui/icons-material/MenuRounded';
 export { default as OpenRegular } from '@mui/icons-material/OpenInNewRounded';
 export { default as MoneyRegular } from '@mui/icons-material/PaymentsOutlined';
 export { default as PeopleRegular } from '@mui/icons-material/GroupsOutlined';
 export { default as PersonRegular } from '@mui/icons-material/PersonOutlineRounded';
+export { default as PhoneRegular } from '@mui/icons-material/LocalPhoneOutlined';
 export { default as SaveRegular } from '@mui/icons-material/SaveOutlined';
 export { default as SearchRegular } from '@mui/icons-material/SearchRounded';
 export { default as SettingsRegular } from '@mui/icons-material/TuneRounded';

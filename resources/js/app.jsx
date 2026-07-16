@@ -37,7 +37,12 @@ function SenaApplication({ apiBase, assetsUrl, loginUrl, logoutUrl }) {
     const [dark, setDark] = useState(() => localStorage.getItem('sena-theme') === 'dark');
     const me = useQuery({ queryKey: ['me'], queryFn: () => apiRequest(`${apiBase}/me`), retry: false });
     const currentUser = me.data?.data;
-    const user = currentUser ? { ...currentUser, photo_url: currentUser.photo_path ? `${apiBase}/profile/photo` : null } : null;
+    const user = currentUser ? {
+        ...currentUser,
+        photo_url: currentUser.photo_url || (currentUser.photo_path
+            ? `${apiBase}/profile/photo?v=${encodeURIComponent(currentUser.updated_at || '')}`
+            : null),
+    } : null;
     const notifications = useQuery({
         queryKey: ['notifications', 'badge'],
         queryFn: () => apiRequest(`${apiBase}/notifications?per_page=100`),

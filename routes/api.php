@@ -27,7 +27,7 @@ Route::prefix('v1')->group(function (): void {
         return response()->json(['data' => $user?->only([
             'id', 'school_id', 'display_name', 'school_name', 'teacher_name', 'position',
             'address_line', 'subdistrict', 'district', 'province', 'postal_code', 'phone',
-            'latitude', 'longitude', 'photo_path', 'parent_id', 'role', 'status',
+            'latitude', 'longitude', 'photo_path', 'parent_id', 'role', 'status', 'updated_at',
         ])]);
     })->middleware('web');
 

@@ -5,7 +5,8 @@ const fontFamily = "'Noto Sans Thai', Tahoma, system-ui, sans-serif";
 const base = {
     typography: {
         fontFamily,
-        button: { fontFamily, fontWeight: 700, textTransform: 'none' },
+        fontSize: 15,
+        button: { fontFamily, fontSize: 14, fontWeight: 700, textTransform: 'none' },
         h1: { fontFamily, fontWeight: 800, letterSpacing: '-0.03em' },
         h2: { fontFamily, fontWeight: 750, letterSpacing: '-0.015em' },
     },
@@ -15,7 +16,7 @@ const base = {
             defaultProps: { disableRipple: true },
             styleOverrides: {
                 root: {
-                    minHeight: 40,
+                    minHeight: 44,
                     paddingInline: 16,
                     borderRadius: 11,
                     boxShadow: 'none',
@@ -37,7 +38,7 @@ const base = {
         MuiOutlinedInput: {
             styleOverrides: {
                 root: { borderRadius: 11, backgroundImage: 'none' },
-                input: { paddingBlock: 11.5 },
+                input: { paddingBlock: 12.5 },
             },
         },
         MuiCard: { styleOverrides: { root: { backgroundImage: 'none' } } },
@@ -54,11 +55,11 @@ export const senaLightTheme = createTheme({
     ...base,
     palette: {
         mode: 'light',
-        primary: { main: '#0f766e', dark: '#0b5b56', light: '#d9f1ed', contrastText: '#f7fffd' },
-        secondary: { main: '#273b43' },
-        background: { default: '#f2f6f6', paper: '#fbfdfd' },
-        text: { primary: '#17272d', secondary: '#66777d' },
-        divider: '#dce5e6',
+        primary: { main: '#6d3aa8', dark: '#51267f', light: '#e9dcf7', contrastText: '#fffaff' },
+        secondary: { main: '#e4b72f', dark: '#a97800', light: '#fff2b8', contrastText: '#352400' },
+        background: { default: '#f7f3fa', paper: '#fffcff' },
+        text: { primary: '#271c31', secondary: '#746a7d' },
+        divider: '#e2d9e8',
         success: { main: '#2f7d5c' },
         warning: { main: '#a96f12' },
         error: { main: '#bb3e4a' },
@@ -70,11 +71,11 @@ export const senaDarkTheme = createTheme({
     ...base,
     palette: {
         mode: 'dark',
-        primary: { main: '#5bc1b4', dark: '#35a99a', light: '#163d3b', contrastText: '#102022' },
-        secondary: { main: '#b8c8cc' },
-        background: { default: '#11191d', paper: '#182328' },
-        text: { primary: '#edf5f5', secondary: '#9fb0b5' },
-        divider: '#304046',
+        primary: { main: '#c7a4f2', dark: '#a87adb', light: '#3a2850', contrastText: '#21132e' },
+        secondary: { main: '#f4cf5a', dark: '#c69d22', light: '#493c16', contrastText: '#261b00' },
+        background: { default: '#17111d', paper: '#21182a' },
+        text: { primary: '#f8f2fc', secondary: '#b9adbf' },
+        divider: '#44364e',
         success: { main: '#68bd91' },
         warning: { main: '#e1ae54' },
         error: { main: '#e27882' },
