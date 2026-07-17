@@ -148,6 +148,34 @@ class DataVisibilityScopeTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_same_lecturer_id_card_can_be_registered_by_different_subdistricts_only(): void
+    {
+        $district = $this->user('DISTRICT-ONE', 'district_admin');
+        $firstSubdistrict = $this->user('SUBDISTRICT-ONE', 'subdistrict_admin', $district->id);
+        $secondSubdistrict = $this->user('SUBDISTRICT-TWO', 'subdistrict_admin', $district->id);
+        $payload = [
+            'prefix' => 'นาย',
+            'first_name' => 'วิทยากรร่วม',
+            'last_name' => 'สองตำบล',
+            'id_card' => '4999999999999',
+            'expertise' => 'การใช้เทคโนโลยี',
+        ];
+
+        $this->actingAs($firstSubdistrict)->postJson('/api/v1/lecturers', $payload)
+            ->assertCreated()
+            ->assertJsonPath('data.created_by', $firstSubdistrict->id);
+
+        $this->actingAs($secondSubdistrict)->postJson('/api/v1/lecturers', $payload)
+            ->assertCreated()
+            ->assertJsonPath('data.created_by', $secondSubdistrict->id);
+
+        $this->actingAs($firstSubdistrict)->postJson('/api/v1/lecturers', $payload)
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'เลขประจำตัวประชาชนนี้มีอยู่ในทะเบียนวิทยากรของตำบลนี้แล้ว');
+
+        $this->assertDatabaseCount('lecturers', 2);
+    }
+
     private function course(User $owner, string $name, string $status): Course
     {
         return Course::query()->create([
