@@ -183,7 +183,12 @@ class StudentImportController extends Controller
     {
         $value = $cell->getValue();
         if (in_array($field, ['id_card', 'phone'], true) && is_numeric($value)) {
-            return sprintf('%.0f', (float) $value);
+            $text = sprintf('%.0f', (float) $value);
+            if ($field === 'phone' && preg_match('/^\d{8,9}$/', $text)) {
+                return '0'.$text;
+            }
+
+            return $text;
         }
 
         return trim((string) $cell->getFormattedValue());
